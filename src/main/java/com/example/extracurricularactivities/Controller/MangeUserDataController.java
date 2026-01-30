@@ -23,7 +23,7 @@ public class MangeUserDataController {
     public ResponseEntity<String> createUser(@RequestBody Student student){
        try {
            mangeUserDataService.createUser(student);
-           return ResponseEntity.ok("User created");
+           return ResponseEntity.ok("Student created");
        }catch(NotUniqDataException e) {
            return  new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
        }
