@@ -19,7 +19,7 @@ public class Student {
     // child data
     private String childName;
     private String childSurname;
-    private LocalDate childBirthDate;
+    private int childAge;
 
     //parent data
     private String parentName;

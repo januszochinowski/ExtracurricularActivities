@@ -6,15 +6,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-
 @Repository
 public interface StudentDataRepo extends JpaRepository<Student,Long> {
 
     @Query("SELECT COUNT(u.id) FROM  Student u WHERE " +
             " LOWER(u.childName) = LOWER( :name ) AND  LOWER(u.childSurname) = LOWER(:surname)" +
-            "AND u.childBirthDate = :birthDate ")
-    int findSameStudent(String name, String surname, LocalDate birthDate );
+            "AND u.childAge = :birthDate ")
+    int findSameStudent(String name, String surname, int birthDate );
 
 
     @Modifying(clearAutomatically = true)
@@ -26,8 +24,8 @@ public interface StudentDataRepo extends JpaRepository<Student,Long> {
     void updateStudentChildSurnameById(Long id, String surname);
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Student  s SET s.childBirthDate = :birthDate WHERE s.id = :id ")
-    void updateStudentChildBirthDateById(Long id, LocalDate birthDate);
+    @Query("UPDATE Student  s SET s.childAge = :birthDate WHERE s.id = :id ")
+    void updateStudentChildAge(Long id, int  birthDate);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Student  s SET s.parentName= :name WHERE s.id = :id ")

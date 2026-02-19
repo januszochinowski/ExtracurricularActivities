@@ -1,8 +1,8 @@
 package com.example.extracurricularactivities.Service;
 
+import com.example.extracurricularactivities.Exception.NotUniqDataException;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +34,17 @@ public class MangeUserDataService {
 
     /**
      * Check if there is  another student with the same details: childName, childSurname, childBirthDate (all 3)
-     * @param student
-     * @return true when the same student exist in database
+     * @param childName <- childName to check
+     * @param childSurname <- childSurname to check
+     * @param childAge <- childBirthDate to check
+     * @return true if student with the same childName,childSurname and childBirthDate exist in database
      */
-    public boolean isStudentNotUniq(String childName,String childSurname, String childBirthDate){
-       return  studentDataRepo.findSameStudent(student.getChildName(), student.getChildSurname(),student.getChildBirthDate()) >  0;
+    public boolean isStudentNotUniq(String childName,String childSurname, int childAge){
+       return  studentDataRepo.findSameStudent(childName, childSurname,childAge) >  0;
+    }
+
+    public boolean isStudentNotUniq(Student student){
+        return isStudentNotUniq(student.getChildName(),student.getChildSurname(),student.getChildAge());
     }
 
 
@@ -47,7 +53,7 @@ public class MangeUserDataService {
      * @param id
      * @return Optional<Student> object
      */
-    public Optional<Student> getStudentById(long id){
+    public Optional<Student> getStudentById(Long id){
         return studentDataRepo.findById(id);
     }
 
@@ -57,7 +63,7 @@ public class MangeUserDataService {
      * @param id
      */
     @Transactional
-    public void deleteStudentById(long id){
+    public void deleteStudentById(Long id){
         studentDataRepo.deleteById(id);
     }
 
@@ -69,7 +75,7 @@ public class MangeUserDataService {
      * @param student <- updated student data
      */
     @Transactional
-    public void  updateStudent(long id,Student student){
+    public void  updateStudent(Long id,Student student){
         if(isStudentNotUniq(student)) throw new NotUniqDataException();
 
         student.setId(id);
@@ -83,12 +89,18 @@ public class MangeUserDataService {
      * @param parentName <- new value of parentName
      */
     @Transactional
-    public void updateParentName(long id,String parentName){
+    public void updateParentName(Long id,String parentName){
        studentDataRepo.updateStudentParentNameById(id, parentName);
     }
 
+    /**
+     * Update parentSurname in the student with this id
+     * @param id
+     * @param parentSurname <- new value of parentSurname
+     */
+
     @Transactional
-    public void updateParentSurname(long id,String parentSurname){
+    public void updateParentSurname(Long id,String parentSurname){
         studentDataRepo.updateStudentParentSurnameById(id, parentSurname);
     }
 
@@ -100,10 +112,9 @@ public class MangeUserDataService {
      * @param childName
      */
     @Transactional
-    public void updateChildName(long id,String childName){
-        Student student = studentDataRepo.findById(id).get();
-        student.setChildName(childName);
-        if(isStudentNotUniq(student)) throw new NotUniqDataException();
+    public void updateChildName(Long id,String childName){
+        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        if(isStudentNotUniq(childName,student.getChildSurname(),student.getChildAge())) throw new NotUniqDataException();
         studentDataRepo.updateStudentChildNameById(id, childName);
     }
 
@@ -112,14 +123,22 @@ public class MangeUserDataService {
      * Update child in  student's  data with this id  in database. Check if exist in database student with the same childName, childSurname and childBirthData (all 3).
      * If found  throw NotUniqDataException
      * @param id
-     * @param childSurname
+     * @param childSurname <- new value of childSurname
      */
     @Transactional
-    public void updateChildSurname(long id,String childSurname){
-        Student student = studentDataRepo.findById(id).get();
-        student.setChildSurname(childSurname);
-        if(isStudentNotUniq(student)) throw new NotUniqDataException();
+    public void updateChildSurname(Long id,String childSurname){
+        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        if(isStudentNotUniq(student.getChildName(),childSurname,student.getChildAge())) throw new NotUniqDataException();
         studentDataRepo.updateStudentChildSurnameById(id, childSurname);
     }
+
+    @Transactional
+    public void updateChildAge( Long id,String childAge){
+        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        if(isStudentNotUniq(student.getChildName(),student.getChildSurname(),Integer.parseInt(childAge))) throw new NotUniqDataException();
+        studentDataRepo.updateStudentChildAge(id, Integer.parseInt(childAge));
+    }
+
+
 
 }

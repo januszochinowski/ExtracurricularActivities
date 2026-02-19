@@ -1,4 +1,4 @@
-package com.example.extracurricularactivities.Service;
+package com.example.extracurricularactivities.Exception;
 
 public class NotUniqDataException extends RuntimeException{
 

@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -25,7 +23,7 @@ class StudentDataRepoTest {
         student = new Student();
         student.setParentName("root");
         student.setParentSurname("root");
-        student.setChildBirthDate(LocalDate.now());
+        student.setChildAge(10);
         student.setChildSurname("John");
         student.setChildName("Kowalski");
         student.setEmail("john@poczta.pl");
@@ -48,7 +46,7 @@ class StudentDataRepoTest {
 
     @Test
     void findSameStudent() {
-        assertEquals(1, studentDataRepo.findSameStudent(student.getChildName(), student.getChildSurname(),student.getChildBirthDate()));
+        assertEquals(1, studentDataRepo.findSameStudent(student.getChildName(), student.getChildSurname(),student.getChildAge()));
     }
 
 
@@ -70,9 +68,9 @@ class StudentDataRepoTest {
 
     @Test
     void updateStudentChildBirthdayById() {
-        LocalDate newBirthDate = LocalDate.now();
-        studentDataRepo.updateStudentChildBirthDateById( student.getId(), newBirthDate);
-        assertEquals(newBirthDate, studentDataRepo.findById( student.getId()).get().getChildBirthDate());
+        int newBirthDate = 15;
+        studentDataRepo.updateStudentChildAge( student.getId(), newBirthDate);
+        assertEquals(newBirthDate, studentDataRepo.findById( student.getId()).get().getChildAge());
     }
 
     @Test

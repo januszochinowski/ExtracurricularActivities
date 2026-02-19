@@ -1,5 +1,6 @@
 package com.example.extracurricularactivities.Service;
 
+import com.example.extracurricularactivities.Exception.NotUniqDataException;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
 import org.junit.jupiter.api.AfterEach;
@@ -7,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
@@ -27,7 +26,7 @@ class MangeUserDataServiceTest {
         student = new Student();
         student.setParentName("root");
         student.setParentSurname("root");
-        student.setChildBirthDate(LocalDate.now());
+        student.setChildAge(10);
         student.setChildSurname("John");
         student.setChildName("Kowalski");
         student.setEmail("john@poczta.pl");
@@ -46,12 +45,10 @@ class MangeUserDataServiceTest {
         Student newStudent = new Student();
         newStudent.setChildName("Karl");
         newStudent.setChildSurname("Karl");
-        newStudent.setChildBirthDate(LocalDate.now());
+        newStudent.setChildAge(10);
         service.createUser(newStudent);
-        assertEquals(1, studentDataRepo.findSameStudent(newStudent.getChildName(),newStudent.getChildSurname(),newStudent.getChildBirthDate()));
+        assertEquals(1, studentDataRepo.findSameStudent(newStudent.getChildName(),newStudent.getChildSurname(),newStudent.getChildAge()));
         assertThrows(NotUniqDataException.class,() -> service.createUser(newStudent));
-        assertThrows(IllegalArgumentException .class,() -> service.createUser(null));
-
     }
 
 
@@ -72,7 +69,7 @@ class MangeUserDataServiceTest {
         Student newStudent = new Student();
         newStudent.setChildName("Karl");
         newStudent.setChildSurname("Karl");
-        newStudent.setChildBirthDate(LocalDate.now());
+        newStudent.setChildAge(10);
         newStudent.setParentSurname("Karl");
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
@@ -108,7 +105,7 @@ class MangeUserDataServiceTest {
         Student newStudent = new Student();
         newStudent.setChildName(newChildName);
         newStudent.setChildSurname("Karl");
-        newStudent.setChildBirthDate(LocalDate.now());
+        newStudent.setChildAge(10);
         newStudent.setParentSurname("Karl");
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
@@ -126,7 +123,7 @@ class MangeUserDataServiceTest {
         Student newStudent = new Student();
         newStudent.setChildName("Karl");
         newStudent.setChildSurname(newChildSurname);
-        newStudent.setChildBirthDate(LocalDate.now());
+        newStudent.setChildAge(10);
         newStudent.setParentSurname("Karl");
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
