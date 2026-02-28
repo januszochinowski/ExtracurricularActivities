@@ -28,6 +28,7 @@ class StudentDataRepoTest {
         student.setChildName("Kowalski");
         student.setEmail("john@poczta.pl");
         student.setPhoneNumber("1234567890");
+        student.setPassword("password");
         student.setId(studentDataRepo.save(student).getId());
     }
 
@@ -105,5 +106,12 @@ class StudentDataRepoTest {
     void deleteStudentById() {
         studentDataRepo.deleteById(student.getId());
         assertFalse( studentDataRepo.findById(student.getId()).isPresent());
+    }
+
+    @Test
+    void updateStudentPassword() {
+        String newPassword = "password2";
+        studentDataRepo.updateStudentPassword( student.getId(),newPassword);
+        assertEquals(newPassword, studentDataRepo.findById( student.getId()).get().getPassword());
     }
 }

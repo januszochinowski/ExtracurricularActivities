@@ -3,6 +3,7 @@ package com.example.extracurricularactivities.Service;
 import com.example.extracurricularactivities.Exception.NotUniqDataException;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,22 +14,25 @@ public class MangeUserDataService {
 
 
     private StudentDataRepo studentDataRepo;
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public MangeUserDataService(StudentDataRepo studentDataRepo) {
         this.studentDataRepo = studentDataRepo;
+
     }
 
 
     /**
      *  Saving new student in database
      * @param student
-     * @return true if saved
+     * @return id of created student
      */
     @Transactional
-    public void createUser(Student student){
+    public Long createUser(Student student){
 
         if(isStudentNotUniq(student))  throw new NotUniqDataException();
-        studentDataRepo.save(student);
+        student.setPassword(encoder.encode(student.getPassword()));
+        return studentDataRepo.save(student).getId();
     }
 
 

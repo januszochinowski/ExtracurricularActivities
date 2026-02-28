@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentDataRepo extends JpaRepository<Student,Long> {
 
+
     @Query("SELECT COUNT(u.id) FROM  Student u WHERE " +
             " LOWER(u.childName) = LOWER( :name ) AND  LOWER(u.childSurname) = LOWER(:surname)" +
             "AND u.childAge = :birthDate ")
@@ -44,6 +45,9 @@ public interface StudentDataRepo extends JpaRepository<Student,Long> {
     void updateStudentPhoneNumber(Long id, String phoneNumber);
 
     @Modifying(clearAutomatically = true)
+    @Query("UPDATE Student s SET s.password = :newPassword WHERE s.id = :id")
+    void updateStudentPassword(Long id, String newPassword);
+
     void deleteStudentById(Long id);
 
 

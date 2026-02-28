@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Controller for operation with student data
+ */
 
 @RestController
-@RequestMapping("/userData")
+@RequestMapping("/studentData")
 public class MangeUserDataController {
 
     private final  MangeUserDataService mangeUserDataService;
@@ -21,23 +24,37 @@ public class MangeUserDataController {
         this.mangeUserDataService = mangeUserDataService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody Student student){
-           mangeUserDataService.createUser(student);
-           return ResponseEntity.ok("Student created");
-    }
 
+
+    /**
+     * Send student data
+     * @param id <- student id
+     * @return  ok status and student data if student with this id found
+     */
     @GetMapping("")
-    public ResponseEntity<Student> getStudentData(@RequestParam("id") Long id){
-        return ResponseEntity.ok(mangeUserDataService.getStudentById(id).orElseThrow(EntityNotFoundException::new));
+    public ResponseEntity<Student> getStudentData(@RequestParam("id") long id){
+        return ResponseEntity.ok(mangeUserDataService.getStudentById((long) id).orElseThrow(EntityNotFoundException::new));
     }
 
+    /**
+     * Update all student data
+     * @param id <- id student to update
+     * @param student <- new data
+     * @return ok status if update completed successfully
+     */
     @PutMapping("")
     public ResponseEntity<String> updateStudentData(@RequestParam("id") Long id,@RequestBody Student student){
         mangeUserDataService.updateStudent(id, student);
         return ResponseEntity.ok("Student updated");
     }
 
+    /**
+     * Update one of student attribute
+     * @param part <- name of student attribute to update
+     * @param id <- id student to update
+     * @param newValue <- new value of updated attribute
+     * @return ok status if update completed successfully
+     */
     @PatchMapping("/{part}")
     public ResponseEntity<String> updateStudentData(@PathVariable("part") String part, @RequestParam("id") Long id,@RequestParam("value") String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String methodName = "update" + part;
@@ -45,6 +62,12 @@ public class MangeUserDataController {
         return ResponseEntity.ok("Student " + part + " updated");
     }
 
+
+    /**
+     * Delete all student data
+     * @param id <- id student to delete
+     * @return ok status if delete completed successfully
+     */
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteStudentData(@RequestParam("id") Long id){
         mangeUserDataService.deleteStudentById(id);
