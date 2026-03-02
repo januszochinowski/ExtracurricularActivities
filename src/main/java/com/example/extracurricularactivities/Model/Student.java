@@ -24,4 +24,5 @@ public class Student extends User {
     private String parentSurname;
     private String email;
     private String phoneNumber;
+
 }

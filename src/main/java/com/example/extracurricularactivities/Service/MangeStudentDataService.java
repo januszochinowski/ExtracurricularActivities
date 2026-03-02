@@ -10,13 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 @Transactional
 @Service
-public class MangeUserDataService {
+public class MangeStudentDataService {
 
 
     private StudentDataRepo studentDataRepo;
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public MangeUserDataService(StudentDataRepo studentDataRepo) {
+    public MangeStudentDataService(StudentDataRepo studentDataRepo) {
         this.studentDataRepo = studentDataRepo;
 
     }
@@ -28,7 +28,7 @@ public class MangeUserDataService {
      * @return id of created student
      */
     @Transactional
-    public Long createUser(Student student){
+    public Long createStudent(Student student){
 
         if(isStudentNotUniq(student))  throw new NotUniqDataException();
         student.setPassword(encoder.encode(student.getPassword()));

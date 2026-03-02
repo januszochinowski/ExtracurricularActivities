@@ -24,7 +24,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     JWTService jwtService;
     ApplicationContext context;
-
+    public static String id;
 
 
 
@@ -38,7 +38,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
         String token;
-        String id ;
 try {
     if (header != null && header.startsWith("Bearer ")) {
         token = header.substring("Bearer ".length());
