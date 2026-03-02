@@ -3,14 +3,12 @@ package com.example.extracurricularactivities.Controller;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Service.JWTService;
-import com.example.extracurricularactivities.Service.MangeUserDataService;
+import com.example.extracurricularactivities.Service.MangeStudentDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class LoginAndCreateController {
 
 
-    private final MangeUserDataService mangeUserDataService;
+    private final MangeStudentDataService mangeStudentDataService;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
-    public LoginAndCreateController(MangeUserDataService mangeUserDataService, AuthenticationManager authenticationManager, JWTService jwtService) {
-        this.mangeUserDataService = mangeUserDataService;
+    public LoginAndCreateController(MangeStudentDataService mangeStudentDataService, AuthenticationManager authenticationManager, JWTService jwtService) {
+        this.mangeStudentDataService = mangeStudentDataService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
@@ -35,7 +33,7 @@ public class LoginAndCreateController {
      */
     @PostMapping("/create")
     public ResponseEntity<Long> createStudent(@RequestBody Student student){
-        Long id = mangeUserDataService.createUser(student);
+        Long id = mangeStudentDataService.createStudent(student);
         return  new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 

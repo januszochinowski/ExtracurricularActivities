@@ -11,44 +11,52 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
-class MangeUserDataServiceTest {
+class MangeStudentDataServiceTest {
 
     @Autowired
     private StudentDataRepo studentDataRepo;
 
     @Autowired
-    private MangeUserDataService service;
+    private MangeStudentDataService service;
 
     private Student student;
 
     @BeforeEach
     void setUp() {
         student = new Student();
+        student.setPassword("434531243");
         student.setParentName("root");
         student.setParentSurname("root");
-        student.setChildAge(10);
-        student.setChildSurname("John");
-        student.setChildName("Kowalski");
-        student.setEmail("john@poczta.pl");
-        student.setPhoneNumber("1234567890");
+        student.setChildAge(34);
+        student.setChildName("Jan");
+        student.setChildSurname("Kowalski");
+        student.setEmail("dghjagd");
+        student.setPhoneNumber("123456789");
         student.setId(studentDataRepo.save(student).getId());
 
     }
 
     @AfterEach
     void tearDown() {
-        studentDataRepo.deleteAll();
+        studentDataRepo.delete(student);
     }
 
     @Test
-    void createUser() {
+    void createStudent() {
         Student newStudent = new Student();
+        newStudent.setPassword("1234");
+        newStudent.setParentName("Jan");
+        newStudent.setParentSurname("Kowalski");
+        newStudent.setChildAge(13);
         newStudent.setChildName("Karl");
-        newStudent.setChildSurname("Karl");
-        newStudent.setChildAge(10);
-        service.createUser(newStudent);
+        newStudent.setChildSurname("Stoicki");
+        newStudent.setEmail("hdjsahkj");
+        newStudent.setPhoneNumber("31231231");
+
+        service.createStudent(newStudent);
         assertEquals(1, studentDataRepo.findSameStudent(newStudent.getChildName(),newStudent.getChildSurname(),newStudent.getChildAge()));
-        assertThrows(NotUniqDataException.class,() -> service.createUser(newStudent));
+        assertThrows(NotUniqDataException.class,() -> service.createStudent(newStudent));
+        studentDataRepo.delete(newStudent);
     }
 
 
@@ -68,13 +76,14 @@ class MangeUserDataServiceTest {
     void updateStudent() {
         Student newStudent = new Student();
         newStudent.setChildName("Karl");
-        newStudent.setChildSurname("Karl");
-        newStudent.setChildAge(10);
+        newStudent.setChildSurname("Kowalski");
+        newStudent.setChildAge(14);
         newStudent.setParentSurname("Karl");
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
         newStudent.setPhoneNumber("565323445");
         newStudent.setId(student.getId());
+        newStudent.setPassword("12345");
 
         service.updateStudent(student.getId(), newStudent);
         assertEquals(newStudent,service.getStudentById(student.getId()).get());
@@ -110,6 +119,7 @@ class MangeUserDataServiceTest {
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
         newStudent.setPhoneNumber("565323445");
+        newStudent.setPassword("12345");
         newStudent.setId(studentDataRepo.save(newStudent).getId());
         assertThrows(NotUniqDataException.class,() -> service.updateChildName(newStudent.getId(), newChildName));
     }
@@ -128,7 +138,9 @@ class MangeUserDataServiceTest {
         newStudent.setParentName("Karl");
         newStudent.setEmail("gdsfad@hshaj");
         newStudent.setPhoneNumber("565323445");
+        newStudent.setPassword("12345");
         newStudent.setId(studentDataRepo.save(newStudent).getId());
+        newStudent.setPassword("12345");
         assertThrows(NotUniqDataException.class,() -> service.updateChildSurname(student.getId(), newChildSurname));
     }
 

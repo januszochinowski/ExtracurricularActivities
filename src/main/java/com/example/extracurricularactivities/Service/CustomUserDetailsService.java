@@ -1,11 +1,8 @@
 package com.example.extracurricularactivities.Service;
 
-import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Model.UserPrincipal;
-import com.example.extracurricularactivities.Repo.StudentDataRepo;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,10 +13,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
 
-    private final MangeUserDataService mangeUserDataService;
+    private final MangeStudentDataService mangeStudentDataService;
 
-    public CustomUserDetailsService(MangeUserDataService mangeUserDataService) {
-        this.mangeUserDataService = mangeUserDataService;
+    public CustomUserDetailsService(MangeStudentDataService mangeStudentDataService) {
+        this.mangeStudentDataService = mangeStudentDataService;
     }
 
 
@@ -27,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
 
-        User user = mangeUserDataService.getStudentById(Long.parseLong(username)).orElseThrow((() -> new UsernameNotFoundException(username)));
+        User user = mangeStudentDataService.getStudentById(Long.parseLong(username)).orElseThrow((() -> new UsernameNotFoundException(username)));
 
         return new UserPrincipal(user);
     }
