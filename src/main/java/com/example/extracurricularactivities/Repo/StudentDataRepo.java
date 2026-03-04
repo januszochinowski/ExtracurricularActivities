@@ -1,6 +1,8 @@
 package com.example.extracurricularactivities.Repo;
 
 import com.example.extracurricularactivities.Model.Student;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -51,6 +53,13 @@ public interface StudentDataRepo extends JpaRepository<Student,Long> {
     void deleteStudentById(Long id);
 
 
+    Page<Student> findStudentByChildNameStartingWith(String name, Pageable pageable);
+
+    Page<Student> findStudentByChildSurnameStartingWith(String surname, Pageable pageable);
+
+    Page<Student> findStudentByParentSurnameStartingWith(String surname, Pageable pageable);
+
+    Page<Student> findStudentByEmailStartingWith(String email, Pageable pageable);
 
 
 

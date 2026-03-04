@@ -17,12 +17,12 @@ public class Attendance {
     Boolean isPresent;
 
     @ManyToOne
-    @MapsId("student_id")
+    @MapsId("studentId")
     @JoinColumn(name= "student_id", nullable = false)
     Student student;
 
     @ManyToOne
-    @MapsId("attendanceList_id")
+    @MapsId("attendanceListId")
     @JoinColumn(name = "attendanceList_id", nullable = false)
     AttendanceList attendanceList;
 

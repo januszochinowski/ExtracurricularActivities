@@ -11,6 +11,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller for login and register operation (only for student)
+ */
+
 @RestController
 @RequestMapping("")
 public class LoginAndCreateController {

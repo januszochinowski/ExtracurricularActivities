@@ -5,7 +5,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -113,5 +117,33 @@ class StudentDataRepoTest {
         String newPassword = "password2";
         studentDataRepo.updateStudentPassword( student.getId(),newPassword);
         assertEquals(newPassword, studentDataRepo.findById( student.getId()).get().getPassword());
+    }
+
+    @Test
+    void findStudentByChildName() {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Student> page = studentDataRepo.findStudentByChildNameStartingWith(student.getChildName().substring(0,1),pageable);
+        assertEquals(student,page.getContent().get(0));
+    }
+
+    @Test
+    void findStudentByChildSurname() {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Student> page = studentDataRepo.findStudentByChildSurnameStartingWith(student.getChildSurname().substring(0,1),pageable);
+        assertEquals(student,page.getContent().get(0));
+    }
+
+    @Test
+    void findStudentByParentSurname() {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Student> page = studentDataRepo.findStudentByParentSurnameStartingWith(student.getParentSurname().substring(0,1),pageable);
+        assertEquals(student,page.getContent().get(0));
+    }
+
+    @Test
+    void findStudentByEmail() {
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Student> page = studentDataRepo.findStudentByEmailStartingWith(student.getEmail().substring(0,1),pageable);
+        assertEquals(student,page.getContent().get(0));
     }
 }

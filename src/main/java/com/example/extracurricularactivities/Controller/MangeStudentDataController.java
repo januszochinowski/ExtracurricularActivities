@@ -16,11 +16,11 @@ import java.lang.reflect.InvocationTargetException;
 
 @RestController
 @RequestMapping("/studentData")
-public class MangeUserDataController {
+public class MangeStudentDataController {
 
     private final MangeStudentDataService mangeStudentDataService;
 
-    public MangeUserDataController(MangeStudentDataService mangeStudentDataService) {
+    public MangeStudentDataController(MangeStudentDataService mangeStudentDataService) {
         this.mangeStudentDataService = mangeStudentDataService;
 
     }

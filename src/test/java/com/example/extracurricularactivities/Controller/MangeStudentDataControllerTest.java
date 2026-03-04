@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureRestTestClient
-class MangeUserDataControllerTest {
+class MangeStudentDataControllerTest {
 
     private Student student;
 
