@@ -31,7 +31,7 @@ public class LoginAndCreateController {
     }
 
     /**
-     * Create record  for given student in database
+     * Create record for a given student in database
      * @param student <- new student to create
      * @return ok status if created completed successfully
      */

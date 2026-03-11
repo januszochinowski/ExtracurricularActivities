@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 @Transactional
 @Service
@@ -25,7 +26,7 @@ public class MangeStudentDataService {
     /**
      *  Saving new student in database
      * @param student
-     * @return id of created student
+     * @return id of created a student
      */
     @Transactional
     public Long createStudent(Student student){
@@ -72,8 +73,16 @@ public class MangeStudentDataService {
     }
 
 
+    public void updateStudent(Long id, String partName, String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        StringBuilder sb = new StringBuilder(partName);
+        sb.replace(0,1,String.valueOf(sb.charAt(0)).toUpperCase());
+        partName = sb.toString();
+        String methodName = "update" + partName;
+        this.getClass().getDeclaredMethod(methodName, Long.class,String.class).invoke(this,id, newValue);
+    }
+
     /**
-     * Update all student data in database. Check if exist in database student with the same childName, childSurname and childBirthData (all 3).
+     * Update all student data in the database. Check if exists in a database student with the same childName, childSurname and childBirthData (all 3).
      * If found  throw NotUniqDataException
      * @param id
      * @param student <- updated student data

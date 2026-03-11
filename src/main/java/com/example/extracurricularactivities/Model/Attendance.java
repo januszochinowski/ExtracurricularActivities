@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+//Obecność
 public class Attendance {
 
     @EmbeddedId
     AttendanceKey attendanceKey;
 
+    @Column(nullable = false)
     Boolean isPresent;
 
     @ManyToOne

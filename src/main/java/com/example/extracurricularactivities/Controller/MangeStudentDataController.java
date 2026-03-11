@@ -2,6 +2,7 @@ package com.example.extracurricularactivities.Controller;
 
 
 import com.example.extracurricularactivities.Model.Student;
+import com.example.extracurricularactivities.Service.JWTService;
 import com.example.extracurricularactivities.Service.MangeStudentDataService;
 import com.example.extracurricularactivities.config.JWTFilter;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,21 +20,22 @@ import java.lang.reflect.InvocationTargetException;
 public class MangeStudentDataController {
 
     private final MangeStudentDataService mangeStudentDataService;
+    private final JWTService jwtService;
 
-    public MangeStudentDataController(MangeStudentDataService mangeStudentDataService) {
+    public MangeStudentDataController(MangeStudentDataService mangeStudentDataService, JWTService jwtService) {
         this.mangeStudentDataService = mangeStudentDataService;
-
+        this.jwtService = jwtService;
     }
 
 
 
     /**
      * Send student data
-     * @return  ok status and student data if student with this id found
+     * @return  ok status and student data if a student with this id found
      */
     @GetMapping("")
-    public ResponseEntity<Student> getStudentData(){
-        long id = Long.parseLong(JWTFilter.id);
+    public ResponseEntity<Student> getStudentData(@RequestHeader("Authorization") String header){
+        long id = Long.parseLong(jwtService.extractIdFromHeader(header));
         return ResponseEntity.ok(mangeStudentDataService.getStudentById((long) id).orElseThrow(EntityNotFoundException::new));
     }
 
@@ -43,22 +45,25 @@ public class MangeStudentDataController {
      * @return ok status if update completed successfully
      */
     @PutMapping("")
-    public ResponseEntity<String> updateStudentData(@RequestBody Student student){
-        Long id = Long.parseLong(JWTFilter.id);
+    public ResponseEntity<String> updateStudentData(@RequestHeader("Authorization") String header,@RequestBody Student student){
+        Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
         mangeStudentDataService.updateStudent(id, student);
         return ResponseEntity.ok("Student updated");
     }
 
     /**
-     * Update one of student attribute
-     * @param part <- name of student attribute to update (start with big letter)
+     * Update one of student attributes
+     * @param part <- name of student attribute to update
      * @param newValue <- new value of updated attribute
      * @return ok status if update completed successfully
      */
     @PatchMapping("/{part}")
-    public ResponseEntity<String> updateStudentData(@PathVariable("part") String part,@RequestParam("value") String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public ResponseEntity<String> updateStudentData(@PathVariable("part") StringBuilder part,
+                                                    @RequestParam("value") String newValue,
+                                                    @RequestHeader("Authorization") String header) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        part.replace(0,1, String.valueOf(part.charAt(0)).toUpperCase());
         String methodName = "update" + part;
-        Long id = Long.parseLong(JWTFilter.id);
+        Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
         mangeStudentDataService.getClass().getDeclaredMethod(methodName,Long.class,String.class).invoke(mangeStudentDataService,id,newValue);
         return ResponseEntity.ok("Student " + part + " updated");
     }
@@ -68,9 +73,9 @@ public class MangeStudentDataController {
      * Delete all student data
      * @return ok status if delete completed successfully
      */
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteStudentData(){
-        Long id = Long.parseLong(JWTFilter.id);
+    @DeleteMapping()
+    public ResponseEntity<String> deleteStudentData(@RequestHeader("Authorization") String header){
+        Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
         mangeStudentDataService.deleteStudentById(id);
         return ResponseEntity.ok("Student deleted");
     }

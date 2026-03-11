@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @DynamicUpdate
 @Entity
+//Zajęcia
 public class Activity {
 
     @Id

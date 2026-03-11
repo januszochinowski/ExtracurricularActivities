@@ -52,6 +52,7 @@ public interface StudentDataRepo extends JpaRepository<Student,Long> {
 
     void deleteStudentById(Long id);
 
+    Page<Student> findAll(Pageable pageable);
 
     Page<Student> findStudentByChildNameStartingWith(String name, Pageable pageable);
 

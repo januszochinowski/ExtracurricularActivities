@@ -1,7 +1,10 @@
 package com.example.extracurricularactivities.Controller;
 
 import com.example.extracurricularactivities.Model.Student;
+import com.example.extracurricularactivities.RandomUserFactory;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
+import com.example.extracurricularactivities.Service.JWTService;
+import com.example.extracurricularactivities.Service.MangeStudentDataService;
 import com.example.extracurricularactivities.config.SecurityConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MangeStudentDataControllerTest {
 
     private Student student;
+    private String token;
 
     @Autowired
     private StudentDataRepo studentDataRepo;
@@ -32,18 +36,20 @@ class MangeStudentDataControllerTest {
     @Autowired
     private RestTestClient testClient;
 
+    @Autowired
+    private MangeStudentDataService studentService;
+
+    @Autowired
+    private JWTService jwtService;
+
+
+
     @BeforeEach
     void setUp() {
-        student = new Student();
-        student.setParentName("root");
-        student.setParentSurname("root");
-        student.setChildAge(10);
-        student.setChildSurname("John");
-        student.setChildName("Kowalski");
-        student.setEmail("john@poczta.pl");
-        student.setPhoneNumber("1234567890");
-        student.setPassword("password");
-        student.setId(studentDataRepo.save(student).getId());
+        student = RandomUserFactory.getRandomStudent();
+        studentService.createStudent(student);
+        token =  jwtService.generateToken(student.getId().toString());
+
     }
 
     @AfterEach
@@ -51,20 +57,12 @@ class MangeStudentDataControllerTest {
       studentDataRepo.deleteAll();
     }
 
-    @Test
-    void createUser() {
-        testClient.post().uri("/create")
-                .body(student)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class);
 
-
-    }
 
     @Test
     void getStudentData() {
-        testClient.get().uri("/getStudentData")
+        testClient.get().uri("/studentData")
+                .header("Authorization","Bearer " + token)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Student.class)
@@ -74,13 +72,52 @@ class MangeStudentDataControllerTest {
 
     @Test
     void updateStudentData() {
+        student.setChildName("Child Name");
+        testClient.put().uri("/studentData")
+                .header("Authorization","Bearer " + token)
+                .body(student)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo("Student updated");
     }
 
     @Test
-    void testUpdateStudentData() {
+    void patchUpdateStudentData() {
+        String newName = "Robert";
+        testClient.patch().uri("/studentData/ChildName?value="+newName)
+                .header("Authorization","Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo("Student ChildName updated");
+
+        assertEquals(newName,studentDataRepo.findById(student.getId()).get().getChildName());
+
+        newName = "Kamil";
+        testClient.patch().uri("/studentData/childName?value="+newName)
+                .header("Authorization","Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo("Student ChildName updated");
+
+        assertEquals(newName,studentDataRepo.findById(student.getId()).get().getChildName());
+
+
+
     }
 
     @Test
     void deleteStudentData() {
+
+        testClient.delete().uri("/studentData")
+                .header("Authorization","Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .isEqualTo("Student deleted");
+        assertTrue(studentDataRepo.findById(student.getId()).isEmpty());
+
     }
 }

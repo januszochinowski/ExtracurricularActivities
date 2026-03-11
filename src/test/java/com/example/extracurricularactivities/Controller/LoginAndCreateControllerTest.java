@@ -50,6 +50,10 @@ class LoginAndCreateControllerTest {
 
         Student newStudent = new Student();
         newStudent.setPassword("password");
+        newStudent.setChildName("Kasia");
+        newStudent.setChildSurname("Walicki");
+        newStudent.setEmail("hdsakj@dgasggkj");
+        newStudent.setPhoneNumber("1234567890");
 
         Long id = testClient.post().uri("/create")
                 .accept(MediaType.APPLICATION_JSON)
@@ -65,6 +69,7 @@ class LoginAndCreateControllerTest {
 
     @Test
     void userLogin() {
+
 
     }
 }

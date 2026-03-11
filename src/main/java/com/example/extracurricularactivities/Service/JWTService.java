@@ -74,6 +74,10 @@ public class JWTService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public String extractIdFromHeader(String header){
+        return extractId(header.substring("Bearer ".length()));
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
     }

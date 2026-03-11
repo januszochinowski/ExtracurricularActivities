@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class AttendanceKey implements Serializable {
 
     @Column(name=  "student_id" ,nullable = false)
-    Long studentId;;
+    Long studentId;
 
     @Column(name= "attendanceList_id", nullable = false)
     Long attendanceListId;

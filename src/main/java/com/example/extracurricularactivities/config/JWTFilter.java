@@ -24,7 +24,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     JWTService jwtService;
     ApplicationContext context;
-    public static String id;
+    private String id;
 
 
 

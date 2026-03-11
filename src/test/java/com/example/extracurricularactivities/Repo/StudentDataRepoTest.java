@@ -1,6 +1,7 @@
 package com.example.extracurricularactivities.Repo;
 
 import com.example.extracurricularactivities.Model.Student;
+import com.example.extracurricularactivities.RandomUserFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,15 +25,7 @@ class StudentDataRepoTest {
 
     @BeforeEach
     void setUp(){
-        student = new Student();
-        student.setParentName("root");
-        student.setParentSurname("root");
-        student.setChildAge(10);
-        student.setChildSurname("John");
-        student.setChildName("Kowalski");
-        student.setEmail("john@poczta.pl");
-        student.setPhoneNumber("1234567890");
-        student.setPassword("password");
+        student = RandomUserFactory.getRandomStudent();
         student.setId(studentDataRepo.save(student).getId());
     }
 
