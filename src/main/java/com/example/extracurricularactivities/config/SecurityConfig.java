@@ -41,9 +41,9 @@ public class SecurityConfig {
                         .formLogin(AbstractHttpConfigurer::disable)
                         .httpBasic(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                         .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .exceptionHandling(ex -> ex.accessDeniedHandler(new AccessDeniedHandlerImpl()))
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return  http.build();
     }

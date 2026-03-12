@@ -1,5 +1,6 @@
 package com.example.extracurricularactivities.Service;
 
+import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Model.UserPrincipal;
 import org.jetbrains.annotations.NotNull;
@@ -8,24 +9,32 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
 
 
-    private final MangeStudentDataService mangeStudentDataService;
+    private final MangeStudentDataService studentDataService;
+    private final MangeTeachersService teachersService;
 
-    public CustomUserDetailsService(MangeStudentDataService mangeStudentDataService) {
-        this.mangeStudentDataService = mangeStudentDataService;
+    public CustomUserDetailsService(MangeStudentDataService studentDataService, MangeTeachersService teachersService) {
+        this.studentDataService = studentDataService;
+        this.teachersService = teachersService;
     }
 
 
     @NotNull
     @Override
-    public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NotNull String id) throws UsernameNotFoundException {
 
-        User user = mangeStudentDataService.getStudentById(Long.parseLong(username)).orElseThrow((() -> new UsernameNotFoundException(username)));
 
-        return new UserPrincipal(user);
+        Optional<Student> student = studentDataService.getStudentById(Long.parseLong(id));
+        User user = student.isPresent()?
+                student.get()
+                : teachersService.getTeacherById(Long.parseLong(id)).orElseThrow(() -> new UsernameNotFoundException(id));
+
+        return  new UserPrincipal(user);
     }
 }

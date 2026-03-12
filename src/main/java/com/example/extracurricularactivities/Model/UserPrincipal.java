@@ -21,10 +21,12 @@ public class UserPrincipal  implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        if(user.getClass() == Student.class)
-            return Collections.singleton(new SimpleGrantedAuthority("USER"));
-
-
+        if(user instanceof Student)
+            return Collections.singleton(new SimpleGrantedAuthority("STUDENT"));
+        else if(user instanceof Teacher)
+            return ((Teacher) user).isAdmin ?
+                    Collections.singleton(new SimpleGrantedAuthority("ADMIN"))
+                    : Collections.singleton(new SimpleGrantedAuthority("TEACHER"));
 
         return List.of();
     }

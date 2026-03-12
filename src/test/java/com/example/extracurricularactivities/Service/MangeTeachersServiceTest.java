@@ -1,6 +1,5 @@
 package com.example.extracurricularactivities.Service;
 
-import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import org.junit.jupiter.api.AfterEach;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,16 +58,16 @@ class MangeTeachersServiceTest {
     }
 
     @Test
-    void findTeacherById() {
+    void getTeacherById() {
 
-        Teacher teacher2 = service.findTeacherById(teacher.getId()).get();
+        Teacher teacher2 = service.getTeacherById(teacher.getId()).get();
         assertEquals(teacher2,teacher);
     }
 
     @Test
     void deleteTeacherById() {
         service.deleteTeacherById(teacher.getId());
-        assertTrue(service.findTeacherById(teacher.getId()).isEmpty());
+        assertTrue(service.getTeacherById(teacher.getId()).isEmpty());
     }
 
     @Test

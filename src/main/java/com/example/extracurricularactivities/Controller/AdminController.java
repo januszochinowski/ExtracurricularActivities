@@ -37,17 +37,17 @@ public class AdminController {
     @GetMapping
     public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false,defaultValue = "0") int page,
                                                  @RequestParam int size,
-                                                 @RequestParam(required = false, defaultValue = "studnet") String role) {
+                                                 @RequestParam(required = false, defaultValue = "student") String role) {
 
         List<User> users = new ArrayList<>();
 
          role = role.toLowerCase();
-        if(role.equals("teacher")) {
-            users.addAll(teacherService.getAllTeachers(size, page));
-        }else if(role.equals("admin")) {
-            users.addAll(teacherService.getAllAdmin(size, page));
-        }else if(role.equals("student")) {
-           // users.addAll()
+        switch (role) {
+            case "teacher" -> users.addAll(teacherService.getAllTeachers(size, page));
+            case "admin" -> users.addAll(teacherService.getAllAdmin(size, page));
+            case "student" -> {
+            }
+            // users.addAll()
         }
         return  new ResponseEntity<>(users, HttpStatus.OK);
 

@@ -3,8 +3,10 @@ package com.example.extracurricularactivities.Service;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,18 +16,21 @@ import java.util.Optional;
 @Service
 public class MangeTeachersService {
 
-    private TeacherRepo repo;
+    private final TeacherRepo repo;
+    private final ApplicationContext context;
 
-    public MangeTeachersService(TeacherRepo repo) {
+    public MangeTeachersService(TeacherRepo repo,ApplicationContext context) {
         this.repo = repo;
+        this.context = context;
     }
 
     /**
-     * Add new Teacher to database
+     * Add new Teacher to the database
      * @param teacher <- new teacher
      * @return id of new teacher
      */
     public Long addTeacher(Teacher teacher) {
+        teacher.setPassword(context.getBean(BCryptPasswordEncoder.class,"passwordEncoder").encode(teacher.getPassword()));
         return repo.save(teacher).getId();
     }
 
@@ -34,7 +39,7 @@ public class MangeTeachersService {
      * @param id <- teacher id
      * @return optional object of teacher
      */
-    public Optional<Teacher> findTeacherById(Long id) {
+    public Optional<Teacher> getTeacherById(Long id) {
         return repo.findById(id);
     }
 
