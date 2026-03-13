@@ -1,6 +1,5 @@
 package com.example.extracurricularactivities.Controller;
 
-import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Service.MangeStudentDataService;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -35,6 +33,8 @@ public class AdminController {
      * @param page page number
      * @param size max number of elements of page
      * @param role role of Users which being searching
+     * @param startWith give only this user whose selected field begins with this letter/s
+     * @param partName name of selected field
      * @return List of found User and ok status
      */
     @GetMapping
@@ -43,8 +43,6 @@ public class AdminController {
                                                  @RequestParam(required = false, defaultValue = "student") String role,
                                                  @RequestParam(required = false, value="start") String startWith,
                                                  @RequestParam(required = false) String partName) {
-
-
 
         if(startWith.isEmpty()) {
 
@@ -55,29 +53,23 @@ public class AdminController {
                 default -> {throw new NoSuchElementException("Invalid role");}
             }
 
-        }else if(startWith.equals("student")) {
-           return ResponseEntity.ok(studentService.getStudentsStartWith(partName,startWith,size,page));
-        }else if(startWith.equals("teacher")) {
-            return ResponseEntity.ok(teacherService.getAllTeachers(size, page));
-        }else
-            throw new NoSuchElementException("Invalid  partName");
-
+        }else {
+            if (startWith.equals("student")) {
+                return ResponseEntity.ok(studentService.getStudentsStartWith(partName, startWith, size, page));
+            } else if (startWith.equals("teacher")) {
+                return ResponseEntity.ok(teacherService.getTeacherStartWith(partName, startWith, size, page));
+            } else
+                throw new NoSuchElementException("Invalid  partName");
+        }
     }
 
-    private List<Teacher> getTeacherWithStart(String partName,String start, int maxSize, int page) {
 
-        if(partName.equalsIgnoreCase("name"))
-            return teacherService.getAllTeachersWithName(start,maxSize,page);
-        else if (partName.equalsIgnoreCase("surname"))
-            return teacherService.getAllTeachersWithSurname(start,maxSize,page);
-        else
-            throw new EntityNotFoundException("Invalid name of part");
-    }
-
-    private List<Student> getStudentWithStart(String partName,String start, int maxSize, int page) {
-
-    }
-
+    /**
+     * Get user with a selected role and ID
+     * @param id id of wanted user
+     * @param role role of wanted user
+     * @return if found, ok status and User
+     */
     @GetMapping("/{role}")
     public ResponseEntity<User> getUserById(@RequestParam long id, @PathVariable String role) {
 

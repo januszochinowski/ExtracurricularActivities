@@ -1,16 +1,14 @@
 package com.example.extracurricularactivities.Service;
 
 import com.example.extracurricularactivities.Model.Teacher;
+import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -68,6 +66,17 @@ public class MangeTeachersService {
         return repo.findAllAdmin(PageRequest.of(pageNumber, maxSize, Sort.by("surname"))).getContent();
     }
 
+    public List<Teacher> getTeacherStartWith(String partName, String start, int maxSize, int page) {
+
+            if(partName.equalsIgnoreCase("name"))
+                return getAllTeachersWithName(start,maxSize,page);
+            else if (partName.equalsIgnoreCase("surname"))
+                return getAllTeachersWithSurname(start,maxSize,page);
+            else
+                throw new EntityNotFoundException("Invalid name of part");
+
+    }
+
     /**
      * Give one page with Teachers with given name
      * @param name <- start letters or full name of the teacher you are looking for
@@ -75,7 +84,7 @@ public class MangeTeachersService {
      * @param pageNumber <- number of page
      * @return List of Teachers from chosen page
      */
-    public List<Teacher>  getAllTeachersWithName(String name, int maxSize, int pageNumber) {
+    private List<Teacher>  getAllTeachersWithName(String name, int maxSize, int pageNumber) {
         return repo.findTeachersByNameStartingWith(name,PageRequest.of(pageNumber, maxSize)).getContent();
     }
 
@@ -87,7 +96,7 @@ public class MangeTeachersService {
      * @param pageNumber <- number of page
      * @return List of Teachers from chosen page
      */
-    public List<Teacher> getAllTeachersWithSurname(String name, int maxSize, int pageNumber) {
+    private List<Teacher> getAllTeachersWithSurname(String name, int maxSize, int pageNumber) {
         return repo.findTeachersBySurnameStartingWith(name ,PageRequest.of(pageNumber, maxSize)).getContent();
     }
 
@@ -103,11 +112,6 @@ public class MangeTeachersService {
         teacher.getClass().getDeclaredMethod("set" + partName,String.class).invoke(teacher,newValue);
         repo.save(teacher);
    }
-
-
-
-
-
 
 
 

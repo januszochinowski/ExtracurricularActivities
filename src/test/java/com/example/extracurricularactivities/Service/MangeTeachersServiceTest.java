@@ -82,7 +82,7 @@ class MangeTeachersServiceTest {
     void getAllTeachersWithName() {
         teacher2.setName(teacher.getName());
         repo.save(teacher2);
-        List<Teacher> teachers = service.getAllTeachersWithName(teacher.getName(),2,0);
+        List<Teacher> teachers = service.getTeacherStartWith("name",teacher.getName().substring(0,2),2,0);
         assertEquals(teacher,teachers.get(0));
         assertEquals(teacher2,teachers.get(1));
     }
@@ -91,7 +91,7 @@ class MangeTeachersServiceTest {
     void getAllTeachersWithSurname() {
         teacher2.setSurname(teacher.getSurname());
         repo.save(teacher2);
-        List<Teacher> teachers = service.getAllTeachersWithSurname(teacher.getSurname(),2,0);
+        List<Teacher> teachers = service.getTeacherStartWith("surname",teacher.getSurname().substring(0,2),2,0);
         assertEquals(teacher,teachers.get(0));
         assertEquals(teacher2,teachers.get(1));
     }
