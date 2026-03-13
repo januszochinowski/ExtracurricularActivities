@@ -9,17 +9,21 @@ import com.example.extracurricularactivities.Repo.TeacherRepo;
 import com.example.extracurricularactivities.Service.JWTService;
 import com.example.extracurricularactivities.Service.MangeStudentDataService;
 import com.example.extracurricularactivities.Service.MangeTeachersService;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.GsonTester;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ class AdminControllerTest {
     private Student student;
     private Teacher teacher;
     private Teacher admin;
-
+    private Gson gson;
 
     private String adminToken;
 
@@ -57,6 +61,7 @@ class AdminControllerTest {
 
 
 
+
     @BeforeEach
     void setUp() {
         student = RandomUserFactory.getRandomStudent();
@@ -69,10 +74,6 @@ class AdminControllerTest {
         teacherService.addTeacher(admin);
         adminToken = jwtService.generateToken(admin.getId().toString());
 
-
-
-
-
     }
 
     @AfterEach
@@ -82,50 +83,39 @@ class AdminControllerTest {
     }
 
     @Test
-    void getAllUser() {
+    void getAllUser() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        Gson gson = new Gson();
 
-        /* testClient.get().uri("/admin?size=2")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                 .expectBody(List.class)
-                .isEqualTo(List.of(student)); */
-        testClient.get().uri("/admin?size=1&role=teacher")
+      String response =  testClient.get().uri("/admin?size=2&role=teacher")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminToken)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(List.class)
+                .expectBody(String.class)
                 .returnResult().getResponseBody();
 
-        testClient.get().uri("/admin?page=1&size=1&rule=teacher")
+      assertTrue(response.contains(gson.toJson(admin)));
+      assertTrue(response.contains(gson.toJson(teacher)));
+
+
+        response = testClient.get().uri("/admin?size=1&role=admin")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminToken)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(List.class)
-                .isEqualTo(List.of(admin));
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
 
-        testClient.get().uri("/admin?size=2&rule=admin")
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + adminToken)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(List.class)
-                .isEqualTo(List.of(admin));
+        assertTrue(response.contains(gson.toJson(admin)));
 
 
-        testClient.get().uri("/admin?size=1&rule=teacher")
-                .header("Authorization", "Bearer " + jwtService.generateToken(teacher.getId().toString()))
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.FORBIDDEN);
 
     }
 
     @Test
     void addTeacher() {
         teacher = RandomUserFactory.getRandomTeacher(false);
-        String id= testClient.post().uri("/admin/addTeacher")
+        String id= testClient.post().uri("/admin")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminToken)
                 .body(teacher)

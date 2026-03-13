@@ -1,9 +1,11 @@
 package com.example.extracurricularactivities.Controller;
 
+import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Service.MangeStudentDataService;
 import com.example.extracurricularactivities.Service.MangeTeachersService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * User data operations for administrators only
@@ -35,23 +38,62 @@ public class AdminController {
      * @return List of found User and ok status
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false,defaultValue = "0") int page,
+    public ResponseEntity<List<? extends  User>> getAllUser(@RequestParam(required = false,defaultValue = "0") int page,
                                                  @RequestParam int size,
-                                                 @RequestParam(required = false, defaultValue = "student") String role) {
+                                                 @RequestParam(required = false, defaultValue = "student") String role,
+                                                 @RequestParam(required = false, value="start") String startWith,
+                                                 @RequestParam(required = false) String partName) {
 
-        List<User> users = new ArrayList<>();
 
-         role = role.toLowerCase();
-        switch (role) {
-            case "teacher" -> users.addAll(teacherService.getAllTeachers(size, page));
-            case "admin" -> users.addAll(teacherService.getAllAdmin(size, page));
-            case "student" -> {
+
+        if(startWith.isEmpty()) {
+
+            switch (role.toLowerCase()) {
+                case "teacher" -> {return ResponseEntity.ok(teacherService.getAllTeachers(size,page));}
+                case "admin" -> {return ResponseEntity.ok(teacherService.getAllAdmin(size, page));}
+                case "student" -> {return ResponseEntity.ok(studentService.getAllStudents(size, page));}
+                default -> {throw new NoSuchElementException("Invalid role");}
             }
-            // users.addAll()
-        }
-        return  new ResponseEntity<>(users, HttpStatus.OK);
+
+        }else if(startWith.equals("student")) {
+           return ResponseEntity.ok(studentService.getStudentsStartWith(partName,startWith,size,page));
+        }else if(startWith.equals("teacher")) {
+            return ResponseEntity.ok(teacherService.getAllTeachers(size, page));
+        }else
+            throw new NoSuchElementException("Invalid  partName");
 
     }
+
+    private List<Teacher> getTeacherWithStart(String partName,String start, int maxSize, int page) {
+
+        if(partName.equalsIgnoreCase("name"))
+            return teacherService.getAllTeachersWithName(start,maxSize,page);
+        else if (partName.equalsIgnoreCase("surname"))
+            return teacherService.getAllTeachersWithSurname(start,maxSize,page);
+        else
+            throw new EntityNotFoundException("Invalid name of part");
+    }
+
+    private List<Student> getStudentWithStart(String partName,String start, int maxSize, int page) {
+
+    }
+
+    @GetMapping("/{role}")
+    public ResponseEntity<User> getUserById(@RequestParam long id, @PathVariable String role) {
+
+        if(role.equalsIgnoreCase("student"))
+            return ResponseEntity.ok(studentService.getStudentById(id).orElseThrow(EntityNotFoundException::new));
+        else if (role.equalsIgnoreCase("teacher"))
+            return ResponseEntity.ok(teacherService.getTeacherById(id).orElseThrow(EntityNotFoundException::new));
+        else
+            throw new EntityNotFoundException("Invalid name of part");
+
+
+    }
+
+
+
+
 
 
     /**

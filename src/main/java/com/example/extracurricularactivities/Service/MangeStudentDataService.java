@@ -3,22 +3,27 @@ package com.example.extracurricularactivities.Service;
 import com.example.extracurricularactivities.Exception.NotUniqDataException;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 @Transactional
 @Service
 public class MangeStudentDataService {
 
 
-    private StudentDataRepo studentDataRepo;
+    private StudentDataRepo repo;
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public MangeStudentDataService(StudentDataRepo studentDataRepo) {
-        this.studentDataRepo = studentDataRepo;
+    public MangeStudentDataService(StudentDataRepo repo) {
+        this.repo = repo;
 
     }
 
@@ -33,7 +38,7 @@ public class MangeStudentDataService {
 
         if(isStudentNotUniq(student))  throw new NotUniqDataException();
         student.setPassword(encoder.encode(student.getPassword()));
-        return studentDataRepo.save(student).getId();
+        return repo.save(student).getId();
     }
 
 
@@ -42,10 +47,10 @@ public class MangeStudentDataService {
      * @param childName <- childName to check
      * @param childSurname <- childSurname to check
      * @param childAge <- childBirthDate to check
-     * @return true if student with the same childName,childSurname and childBirthDate exist in database
+     * @return true if a student with the same childName, childSurname and childBirthDate exist in database
      */
     public boolean isStudentNotUniq(String childName,String childSurname, int childAge){
-       return  studentDataRepo.findSameStudent(childName, childSurname,childAge) >  0;
+       return  repo.findSameStudent(childName, childSurname,childAge) >  0;
     }
 
     public boolean isStudentNotUniq(Student student){
@@ -59,7 +64,23 @@ public class MangeStudentDataService {
      * @return Optional<Student> object
      */
     public Optional<Student> getStudentById(Long id){
-        return studentDataRepo.findById(id);
+        return repo.findById(id);
+    }
+
+    public List<Student> getAllStudents(int maxSize, int page){
+        return repo.findAll(PageRequest.of(page,maxSize)).getContent();
+    }
+
+
+    public List<Student> getStudentsStartWith(String partName, String start, int maxSize, int page){
+
+        switch(partName.toLowerCase()){
+            case "childname" -> {return repo.findStudentByChildNameStartingWith(start, PageRequest.of(page,maxSize)).getContent();}
+            case "childsurname" ->{return repo.findStudentByChildSurnameStartingWith(start, PageRequest.of(page,maxSize)).getContent();}
+            case "parentsurname" ->{return repo.findStudentByParentSurnameStartingWith(start, PageRequest.of(page,maxSize)).getContent();}
+            case "email" ->  {return repo.findStudentByEmailStartingWith(start, PageRequest.of(page,maxSize)).getContent();}
+            default -> throw new EntityNotFoundException("Invalid part name");
+        }
     }
 
 
@@ -69,7 +90,7 @@ public class MangeStudentDataService {
      */
     @Transactional
     public void deleteStudentById(Long id){
-        studentDataRepo.deleteById(id);
+        repo.deleteById(id);
     }
 
 
@@ -92,7 +113,7 @@ public class MangeStudentDataService {
         if(isStudentNotUniq(student)) throw new NotUniqDataException();
 
         student.setId(id);
-        studentDataRepo.save(student);
+        repo.save(student);
     }
 
 
@@ -103,7 +124,7 @@ public class MangeStudentDataService {
      */
     @Transactional
     public void updateParentName(Long id,String parentName){
-       studentDataRepo.updateStudentParentNameById(id, parentName);
+       repo.updateStudentParentNameById(id, parentName);
     }
 
     /**
@@ -114,7 +135,7 @@ public class MangeStudentDataService {
 
     @Transactional
     public void updateParentSurname(Long id,String parentSurname){
-        studentDataRepo.updateStudentParentSurnameById(id, parentSurname);
+        repo.updateStudentParentSurnameById(id, parentSurname);
     }
 
 
@@ -126,9 +147,9 @@ public class MangeStudentDataService {
      */
     @Transactional
     public void updateChildName(Long id,String childName){
-        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        Student student = repo.findById(id).orElseThrow(NullPointerException::new);
         if(isStudentNotUniq(childName,student.getChildSurname(),student.getChildAge())) throw new NotUniqDataException();
-        studentDataRepo.updateStudentChildNameById(id, childName);
+        repo.updateStudentChildNameById(id, childName);
     }
 
 
@@ -140,17 +161,19 @@ public class MangeStudentDataService {
      */
     @Transactional
     public void updateChildSurname(Long id,String childSurname){
-        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        Student student = repo.findById(id).orElseThrow(NullPointerException::new);
         if(isStudentNotUniq(student.getChildName(),childSurname,student.getChildAge())) throw new NotUniqDataException();
-        studentDataRepo.updateStudentChildSurnameById(id, childSurname);
+        repo.updateStudentChildSurnameById(id, childSurname);
     }
 
     @Transactional
     public void updateChildAge( Long id,String childAge){
-        Student student = studentDataRepo.findById(id).orElseThrow(NullPointerException::new);
+        Student student = repo.findById(id).orElseThrow(NullPointerException::new);
         if(isStudentNotUniq(student.getChildName(),student.getChildSurname(),Integer.parseInt(childAge))) throw new NotUniqDataException();
-        studentDataRepo.updateStudentChildAge(id, Integer.parseInt(childAge));
+        repo.updateStudentChildAge(id, Integer.parseInt(childAge));
     }
+
+
 
 
 

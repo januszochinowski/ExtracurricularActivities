@@ -4,10 +4,13 @@ import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -96,6 +99,7 @@ public class MangeTeachersService {
      */
    public void  update(Long id,String partName, String newValue ) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Teacher teacher = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Teacher with id " + id + " not found!") );
+
         teacher.getClass().getDeclaredMethod("set" + partName,String.class).invoke(teacher,newValue);
         repo.save(teacher);
    }

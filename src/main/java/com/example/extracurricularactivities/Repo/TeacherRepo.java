@@ -18,7 +18,7 @@ public interface TeacherRepo extends JpaRepository<Teacher, Long> {
     @Query("SELECT t FROM Teacher t WHERE t.isAdmin = TRUE")
     public Page<Teacher> findAllAdmin(Pageable pageable);
 
-    @Query("SELECT t FROM Teacher t ")
+    @Query("SELECT t FROM Teacher t")
     public Page<Teacher> getAllTeachers(Pageable pageable);
 
 
