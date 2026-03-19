@@ -2,8 +2,8 @@ package com.example.extracurricularactivities.Controller;
 
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Model.User;
-import com.example.extracurricularactivities.Service.MangeStudentDataService;
-import com.example.extracurricularactivities.Service.MangeTeachersService;
+import com.example.extracurricularactivities.Service.StudentService;
+import com.example.extracurricularactivities.Service.TeachersService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ import java.util.NoSuchElementException;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private MangeTeachersService teacherService;
-    private MangeStudentDataService studentService;
+    private TeachersService teacherService;
+    private StudentService studentService;
 
-    public AdminController(MangeTeachersService teacherService, MangeStudentDataService studentService) {
+    public AdminController(TeachersService teacherService, StudentService studentService) {
         this.teacherService = teacherService;
         this.studentService = studentService;
     }
@@ -40,9 +40,9 @@ public class AdminController {
     @GetMapping
     public ResponseEntity<List<? extends  User>> getAllUser(@RequestParam(required = false,defaultValue = "0") int page,
                                                  @RequestParam int size,
-                                                 @RequestParam(required = false, defaultValue = "student") String role,
-                                                 @RequestParam(required = false, value="start") String startWith,
-                                                 @RequestParam(required = false) String partName) {
+                                                 @RequestParam(required = false,value="role", defaultValue = "student") String role,
+                                                 @RequestParam(required = false, value="start", defaultValue = "") String startWith,
+                                                 @RequestParam(required = false, value="part") String partName) {
 
         if(startWith.isEmpty()) {
 
@@ -54,9 +54,9 @@ public class AdminController {
             }
 
         }else {
-            if (startWith.equals("student")) {
+            if (role.equals("student")) {
                 return ResponseEntity.ok(studentService.getStudentsStartWith(partName, startWith, size, page));
-            } else if (startWith.equals("teacher")) {
+            } else if (role.equals("teacher") || role.equals("admin") ) {
                 return ResponseEntity.ok(teacherService.getTeacherStartWith(partName, startWith, size, page));
             } else
                 throw new NoSuchElementException("Invalid  partName");
@@ -82,10 +82,6 @@ public class AdminController {
 
 
     }
-
-
-
-
 
 
     /**
@@ -135,7 +131,7 @@ public class AdminController {
     public ResponseEntity<String> updateTeacher(@RequestParam long id,
                                                 @RequestParam("value") String newValue,
                                                 @PathVariable("role")  String role,
-                                                @PathVariable("part") String partName) throws NoSuchMethodException {
+                                                @PathVariable("part") StringBuilder partName) throws NoSuchMethodException {
         try {
 
             if(role.equals("teacher") || role.equals("admin")) {

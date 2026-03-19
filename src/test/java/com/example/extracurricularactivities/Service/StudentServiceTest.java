@@ -11,13 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
-class MangeStudentDataServiceTest {
+class StudentServiceTest {
 
     @Autowired
     private StudentDataRepo studentDataRepo;
 
     @Autowired
-    private MangeStudentDataService service;
+    private StudentService service;
 
     private Student student;
 

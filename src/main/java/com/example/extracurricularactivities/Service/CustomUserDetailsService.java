@@ -16,10 +16,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
 
-    private final MangeStudentDataService studentDataService;
-    private final MangeTeachersService teachersService;
+    private final StudentService studentDataService;
+    private final TeachersService teachersService;
 
-    public CustomUserDetailsService(MangeStudentDataService studentDataService, MangeTeachersService teachersService) {
+    public CustomUserDetailsService(StudentService studentDataService, TeachersService teachersService) {
         this.studentDataService = studentDataService;
         this.teachersService = teachersService;
     }

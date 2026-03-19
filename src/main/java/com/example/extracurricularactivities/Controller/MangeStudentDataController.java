@@ -3,8 +3,7 @@ package com.example.extracurricularactivities.Controller;
 
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Service.JWTService;
-import com.example.extracurricularactivities.Service.MangeStudentDataService;
-import com.example.extracurricularactivities.config.JWTFilter;
+import com.example.extracurricularactivities.Service.StudentService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +18,11 @@ import java.lang.reflect.InvocationTargetException;
 @RequestMapping("/studentData")
 public class MangeStudentDataController {
 
-    private final MangeStudentDataService mangeStudentDataService;
+    private final StudentService studentService;
     private final JWTService jwtService;
 
-    public MangeStudentDataController(MangeStudentDataService mangeStudentDataService, JWTService jwtService) {
-        this.mangeStudentDataService = mangeStudentDataService;
+    public MangeStudentDataController(StudentService studentService, JWTService jwtService) {
+        this.studentService = studentService;
         this.jwtService = jwtService;
     }
 
@@ -36,7 +35,7 @@ public class MangeStudentDataController {
     @GetMapping("")
     public ResponseEntity<Student> getStudentData(@RequestHeader("Authorization") String header){
         long id = Long.parseLong(jwtService.extractIdFromHeader(header));
-        return ResponseEntity.ok(mangeStudentDataService.getStudentById((long) id).orElseThrow(EntityNotFoundException::new));
+        return ResponseEntity.ok(studentService.getStudentById((long) id).orElseThrow(EntityNotFoundException::new));
     }
 
     /**
@@ -47,7 +46,7 @@ public class MangeStudentDataController {
     @PutMapping("")
     public ResponseEntity<String> updateStudentData(@RequestHeader("Authorization") String header,@RequestBody Student student){
         Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
-        mangeStudentDataService.updateStudent(id, student);
+        studentService.updateStudent(id, student);
         return ResponseEntity.ok("Student updated");
     }
 
@@ -64,7 +63,7 @@ public class MangeStudentDataController {
         part.replace(0,1, String.valueOf(part.charAt(0)).toUpperCase());
         String methodName = "update" + part;
         Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
-        mangeStudentDataService.getClass().getDeclaredMethod(methodName,Long.class,String.class).invoke(mangeStudentDataService,id,newValue);
+        studentService.getClass().getDeclaredMethod(methodName,Long.class,String.class).invoke(studentService,id,newValue);
         return ResponseEntity.ok("Student " + part + " updated");
     }
 
@@ -76,7 +75,7 @@ public class MangeStudentDataController {
     @DeleteMapping()
     public ResponseEntity<String> deleteStudentData(@RequestHeader("Authorization") String header){
         Long id = Long.parseLong(jwtService.extractIdFromHeader(header));
-        mangeStudentDataService.deleteStudentById(id);
+        studentService.deleteStudentById(id);
         return ResponseEntity.ok("Student deleted");
     }
 

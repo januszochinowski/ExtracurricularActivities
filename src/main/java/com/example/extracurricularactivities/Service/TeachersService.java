@@ -1,7 +1,6 @@
 package com.example.extracurricularactivities.Service;
 
 import com.example.extracurricularactivities.Model.Teacher;
-import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.ApplicationContext;
@@ -15,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MangeTeachersService {
+public class TeachersService {
 
     private final TeacherRepo repo;
     private final ApplicationContext context;
 
-    public MangeTeachersService(TeacherRepo repo,ApplicationContext context) {
+    public TeachersService(TeacherRepo repo, ApplicationContext context) {
         this.repo = repo;
         this.context = context;
     }
@@ -106,10 +105,10 @@ public class MangeTeachersService {
      * @param partName <- name filed to update
      * @param newValue <- new value
      */
-   public void  update(Long id,String partName, String newValue ) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Teacher teacher = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Teacher with id " + id + " not found!") );
+   public void  update(Long id,StringBuilder partName, String newValue ) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-        teacher.getClass().getDeclaredMethod("set" + partName,String.class).invoke(teacher,newValue);
+        Teacher teacher = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Teacher with id " + id + " not found!") );
+        teacher.getClass().getDeclaredMethod("set" + ActivityService.firstLetterToUpper(partName),String.class).invoke(teacher,newValue);
         repo.save(teacher);
    }
 

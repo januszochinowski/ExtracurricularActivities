@@ -2,30 +2,23 @@ package com.example.extracurricularactivities.Controller;
 
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
-import com.example.extracurricularactivities.Model.User;
 import com.example.extracurricularactivities.RandomUserFactory;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import com.example.extracurricularactivities.Service.JWTService;
-import com.example.extracurricularactivities.Service.MangeStudentDataService;
-import com.example.extracurricularactivities.Service.MangeTeachersService;
+import com.example.extracurricularactivities.Service.StudentService;
+import com.example.extracurricularactivities.Service.TeachersService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.json.GsonTester;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,10 +37,10 @@ class AdminControllerTest {
     RestTestClient testClient;
 
     @Autowired
-    MangeTeachersService  teacherService;
+    TeachersService teacherService;
 
     @Autowired
-    MangeStudentDataService studentService;
+    StudentService studentService;
 
     @Autowired
     TeacherRepo teacherRepo;
@@ -108,6 +101,22 @@ class AdminControllerTest {
 
         assertTrue(response.contains(gson.toJson(admin)));
 
+        response = testClient.get().uri("/admin?size=1&role=admin&start="+admin.getName().substring(0,2)+"&part=name")
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+        assertTrue(response.contains(gson.toJson(admin)));
+
+
+        String teacherToken = jwtService.generateToken(teacher.getId().toString());
+
+        testClient.get().uri("/admin?size=1")
+                .header("Authorization", "Bearer " + teacherToken)
+                .exchange()
+                .expectStatus().isForbidden();
 
 
     }

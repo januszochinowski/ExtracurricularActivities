@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ManyToAny;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,7 +21,7 @@ public class AttendanceList {
     private Long id;
 
     @Column(nullable = false)
-    LocalDate startDate;
+    LocalDate date;
 
     @Column(nullable = false)
     Boolean isCancelled;
@@ -40,6 +38,13 @@ public class AttendanceList {
     @ManyToOne
     @JoinColumn(name = "substitute_teacher_id")
     Teacher substituteTeacher;
+
+    public AttendanceList(Activity activity, LocalDate date){
+        this.activity = activity;
+        this.date = date;
+        isCancelled = false;
+        startTime = activity.getStartTime();
+    }
 
 
 

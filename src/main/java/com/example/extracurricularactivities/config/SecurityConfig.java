@@ -42,7 +42,9 @@ public class SecurityConfig {
                         .httpBasic(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                                .requestMatchers("/teacher/**").hasRole("TEACHER")
+                                .anyRequest().authenticated()
+                        )
                         .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return  http.build();

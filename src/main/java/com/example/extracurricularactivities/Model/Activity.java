@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -54,7 +55,11 @@ public class Activity {
     LocalTime startTime;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(nullable = false, name = "teacher_id")
     Teacher teacher;
+
+    @OneToMany(mappedBy = "activity")
+    List<AttendanceList> attendanceList;
+
 
 }

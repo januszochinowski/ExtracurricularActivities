@@ -1,8 +1,12 @@
 package com.example.extracurricularactivities;
 
+import com.example.extracurricularactivities.Model.Activity;
+import com.example.extracurricularactivities.Model.AttendanceList;
 import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +41,22 @@ public abstract class RandomUserFactory {
         teacher.setIsAdmin(isAdmin);
         return teacher;
     }
+    public static Activity getRandomActivity(Teacher teacher) {
+        Activity activity = new Activity();
+        activity.setName(RandomUserFactory.getRandomString(8));
+        activity.setDescription(RandomUserFactory.getRandomString(8));
+        activity.setLocation((RandomUserFactory.getRandomString(10)));
+        activity.setMinAge(0);
+        activity.setMaxAge(10);
+        activity.setStartDate(LocalDate.now());
+        activity.setEndDate(LocalDate.now());
+        activity.setDuration(10);
+        activity.setMaxNumberOfStudents(10);
+        activity.setStartTime(LocalTime.now());
+        activity.setTeacher(teacher);
+        return activity;
+    }
+
 
 
 
@@ -52,4 +72,7 @@ public abstract class RandomUserFactory {
         return new String(chars);
 
     }
+
+
+
 }

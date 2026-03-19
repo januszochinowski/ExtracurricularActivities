@@ -14,10 +14,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class MangeTeachersServiceTest {
+class TeachersServiceTest {
 
     @Autowired
-    private MangeTeachersService service;
+    private TeachersService service;
 
     @Autowired
     private TeacherRepo repo;
@@ -99,7 +99,7 @@ class MangeTeachersServiceTest {
     @Test
     void update() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         String newValue = "gjdhsakg";
-        service.update(teacher.getId(),"Name",newValue);
+        service.update(teacher.getId(), new StringBuilder("Name"),newValue);
         assertEquals(newValue,repo.findById(teacher.getId()).get().getName());
 
     }

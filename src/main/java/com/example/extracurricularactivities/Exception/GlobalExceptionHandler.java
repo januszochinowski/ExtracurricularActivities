@@ -39,6 +39,12 @@ public class GlobalExceptionHandler {
         return  new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(AccessForbiddenActivity.class)
+    public ResponseEntity<String> handleAccessForbiddenActivity(AccessForbiddenActivity activity) {
+        logger.error(activity.toString());
+        return new ResponseEntity<>(activity.toString(), HttpStatus.FORBIDDEN);
+    }
+
 
 
 

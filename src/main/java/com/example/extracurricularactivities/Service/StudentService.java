@@ -5,24 +5,22 @@ import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Repo.StudentDataRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 @Transactional
 @Service
-public class MangeStudentDataService {
+public class StudentService {
 
 
     private StudentDataRepo repo;
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public MangeStudentDataService(StudentDataRepo repo) {
+    public StudentService(StudentDataRepo repo) {
         this.repo = repo;
 
     }
@@ -94,12 +92,8 @@ public class MangeStudentDataService {
     }
 
 
-    public void updateStudent(Long id, String partName, String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        StringBuilder sb = new StringBuilder(partName);
-        sb.replace(0,1,String.valueOf(sb.charAt(0)).toUpperCase());
-        partName = sb.toString();
-        String methodName = "update" + partName;
-        this.getClass().getDeclaredMethod(methodName, Long.class,String.class).invoke(this,id, newValue);
+    public void updateStudent(Long id, StringBuilder partName, String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        this.getClass().getDeclaredMethod("update" + ActivityService.firstLetterToUpper(partName), Long.class,String.class).invoke(this,id, newValue);
     }
 
     /**
