@@ -27,7 +27,7 @@ public class AttendanceListService {
      * @param activity new Activity
      */
     public void create(Activity activity){
-        for(LocalDate date = activity.getStartDate(); date.isBefore(activity.getEndDate()); date.plusDays(7)){
+        for(LocalDate date = activity.getStartDate(); date.isBefore(activity.getEndDate()); date = date.plusDays(7)){
             repo.save(new AttendanceList(activity,date));
         }
     }
@@ -45,7 +45,7 @@ public class AttendanceListService {
     }
 
     /**
-     * Get all Activity
+     * Get all AttendanceList
      * @param page page number
      * @param size page size
      * @return list of founded AttendanceList
