@@ -4,10 +4,17 @@ import com.example.extracurricularactivities.Exception.AccessForbiddenActivity;
 import com.example.extracurricularactivities.Model.Activity;
 import com.example.extracurricularactivities.Repo.ActivityRepo;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
@@ -39,6 +46,38 @@ public class ActivityService {
     public Optional<Activity> getActivityById(Long id){
         return repo.findById(id);
     }
+
+    public List<Activity> getActivitiesByTeacherId(Long teacherId, int page, int pageSize){
+        return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
+    }
+
+    public List<Activity> getActivitiesByNameStartingWith(String name, int page, int pageSize){
+        return repo.findActivitiesByNameStartingWith(name , PageRequest.of(page, pageSize)).getContent();
+    }
+
+    public List<Activity> getActivitiesByLocationStartingWith(String name, int page, int pageSize){
+        return repo.findActivitiesByLocationStartingWith(name , PageRequest.of(page, pageSize)).getContent();
+    }
+
+    public List<Activity> getActivitiesByDayOfWeek(String dayOfWeek, int page, int pageSize){
+        List<Activity> activities =  new ArrayList<>();
+        Pageable pageable = PageRequest.of(page, pageSize);
+        int pageCounter = 0;
+
+        while(pageable.getPageNumber() < pageable.getPageSize() && pageCounter < pageSize) {
+            List<Activity> list = repo.findAll(pageable)
+                    .stream()
+                    .filter(activity -> activity.getStartDate().getDayOfWeek().toString().equals(dayOfWeek))
+                    .toList();
+            pageCounter += list.size();
+            activities.addAll(list);
+            pageable = pageable.next();
+        }
+
+
+        return activities;
+    }
+
 
     /**
      * Update all data in selected activity
@@ -97,6 +136,8 @@ public class ActivityService {
     public static StringBuilder firstLetterToUpper(StringBuilder builder){
        return builder.replace(0,1, String.valueOf(builder.charAt(0)).toUpperCase());
     }
+
+
 
 
 }

@@ -1,19 +1,23 @@
 package com.example.extracurricularactivities.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @Entity
 //Lista obecności
-public class AttendanceList {
+public class Lesson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +43,11 @@ public class AttendanceList {
     @JoinColumn(name = "substitute_teacher_id")
     Teacher substituteTeacher;
 
-    public AttendanceList(Activity activity, LocalDate date){
+    @OneToMany(mappedBy = "lesson_id")
+    @JsonIgnore
+    List<Attendance> attendances;
+
+    public Lesson(Activity activity, LocalDate date){
         this.activity = activity;
         this.date = date;
         isCancelled = false;

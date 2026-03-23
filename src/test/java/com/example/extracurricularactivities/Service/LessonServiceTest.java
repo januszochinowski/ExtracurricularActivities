@@ -1,32 +1,27 @@
 package com.example.extracurricularactivities.Service;
 
 import com.example.extracurricularactivities.Model.Activity;
-import com.example.extracurricularactivities.Model.AttendanceList;
+import com.example.extracurricularactivities.Model.Lesson;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.RandomUserFactory;
-import com.example.extracurricularactivities.Repo.ActivityRepo;
-import com.example.extracurricularactivities.Repo.AttendanceListRepo;
-import com.example.extracurricularactivities.Repo.TeacherRepo;
-import org.checkerframework.checker.units.qual.A;
+import com.example.extracurricularactivities.Repo.LessonRepo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
-class AttendanceListServiceTest {
+class LessonServiceTest {
 
     @Autowired
-    AttendanceListService service;
+    LessonService service;
 
     @Autowired
     TeachersService teacherService;
@@ -35,7 +30,7 @@ class AttendanceListServiceTest {
     ActivityService activityService;
 
     @Autowired
-    AttendanceListRepo repo;
+    LessonRepo repo;
 
     Teacher teacher;
     Activity activity;
@@ -75,21 +70,21 @@ class AttendanceListServiceTest {
     @Test
     @Transactional
     void get() {
-        AttendanceList attendanceList = new AttendanceList(activity,LocalDate.now());
-        repo.save(attendanceList);
-        assertEquals(attendanceList,service.get(attendanceList.getId()).get());
+        Lesson lesson = new Lesson(activity,LocalDate.now());
+        repo.save(lesson);
+        assertEquals(lesson,service.get(lesson.getId()).get());
     }
 
     @Test
     @Transactional
     void getAll() {
-        AttendanceList attendanceList = new AttendanceList(activity,LocalDate.now());
-        AttendanceList attendanceList1 = new AttendanceList(activity,LocalDate.now());
+        Lesson lesson = new Lesson(activity,LocalDate.now());
+        Lesson lesson1 = new Lesson(activity,LocalDate.now());
 
-        repo.save(attendanceList);
-        repo.save(attendanceList1);
+        repo.save(lesson);
+        repo.save(lesson1);
 
-        assertArrayEquals( new AttendanceList[]{attendanceList,attendanceList1},service.getAll(0,3).toArray());
+        assertArrayEquals( new Lesson[]{lesson, lesson1},service.getAll(0,3).toArray());
 
     }
 
@@ -102,14 +97,14 @@ class AttendanceListServiceTest {
         Activity newActivity = RandomUserFactory.getRandomActivity(teacher1);
         activityService.addActivity(newActivity,teacher1.getId());
 
-        AttendanceList  attendanceList = new AttendanceList(activity,LocalDate.now());
-        AttendanceList attendanceList1 = new AttendanceList(newActivity,LocalDate.now());
+        Lesson lesson = new Lesson(activity,LocalDate.now());
+        Lesson lesson1 = new Lesson(newActivity,LocalDate.now());
 
-        repo.save(attendanceList);
-        repo.save(attendanceList1);
+        repo.save(lesson);
+        repo.save(lesson1);
 
-        assertArrayEquals( new AttendanceList[]{attendanceList},service.getAllMy(0,3,teacher.getId()).toArray());
-        assertArrayEquals( new AttendanceList[]{attendanceList1}, service.getAllMy(0,3,teacher1.getId()).toArray());
+        assertArrayEquals( new Lesson[]{lesson},service.getAllMy(0,3,teacher.getId()).toArray());
+        assertArrayEquals( new Lesson[]{lesson1}, service.getAllMy(0,3,teacher1.getId()).toArray());
 
     }
 
@@ -123,24 +118,34 @@ class AttendanceListServiceTest {
         activityService.addActivity(newActivity,teacher1.getId());
         LocalDate date = LocalDate.now().plusDays(10);
         LocalDate date2 = LocalDate.now();
-        AttendanceList  attendanceList = new AttendanceList(activity,date);
-        AttendanceList attendanceList1 = new AttendanceList(newActivity,date);
-        AttendanceList attendanceList2 = new AttendanceList(activity,date2);
+        Lesson lesson = new Lesson(activity,date);
+        Lesson lesson1 = new Lesson(newActivity,date);
+        Lesson lesson2 = new Lesson(activity,date2);
 
-        repo.save(attendanceList);
-        repo.save(attendanceList1);
-        repo.save(attendanceList2);
+        repo.save(lesson);
+        repo.save(lesson1);
+        repo.save(lesson2);
 
-        assertArrayEquals(new AttendanceList[]{attendanceList1},service.getAllMy(0,10,teacher1.getId(),date).toArray());
-        assertArrayEquals(new AttendanceList[]{attendanceList2}, service.getAllMy(0,10,teacher.getId(),date2).toArray());
+        assertArrayEquals(new Lesson[]{lesson1},service.getAllMy(0,10,teacher1.getId(),date).toArray());
+        assertArrayEquals(new Lesson[]{lesson2}, service.getAllMy(0,10,teacher.getId(),date2).toArray());
 
     }
 
     @Test
+    @Transactional
     void update() {
+        Lesson lesson = new Lesson(activity,LocalDate.now());
+        repo.save(lesson);
+        lesson.setIsCancelled(true);
+        service.update(lesson);
+        assertTrue(service.get(lesson.getId()).get().getIsCancelled());
     }
 
     @Test
-    void testUpdate() {
+    @Transactional
+    void UpdateWithPartName() {
+        Lesson lesson = new Lesson(activity,LocalDate.now());
+        repo.save(lesson);
+
     }
 }

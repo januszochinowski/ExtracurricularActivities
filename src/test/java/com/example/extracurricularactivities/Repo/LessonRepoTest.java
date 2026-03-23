@@ -1,27 +1,24 @@
 package com.example.extracurricularactivities.Repo;
 
 import com.example.extracurricularactivities.Model.Activity;
-import com.example.extracurricularactivities.Model.AttendanceList;
+import com.example.extracurricularactivities.Model.Lesson;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.RandomUserFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.time.temporal.TemporalAmount;
 
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
-class AttendanceListRepoTest {
+class LessonRepoTest {
 
     @Autowired
-    private AttendanceListRepo attendanceListRepo;
+    private LessonRepo lessonRepo;
 
     @Autowired
     private ActivityRepo activityRepo;
@@ -31,7 +28,7 @@ class AttendanceListRepoTest {
 
     Teacher teacher;
     Activity activity;
-    AttendanceList attendanceList;
+    Lesson lesson;
 
     @BeforeEach
     void setUp() {
@@ -41,32 +38,32 @@ class AttendanceListRepoTest {
         activity = RandomUserFactory.getRandomActivity(teacher);
         activityRepo.save(activity);
 
-        attendanceList = new AttendanceList(activity, LocalDate.now());
-        attendanceListRepo.save(attendanceList);
+        lesson = new Lesson(activity, LocalDate.now());
+        lessonRepo.save(lesson);
     }
 
     @AfterEach
     void tearDown() {
-        attendanceListRepo.deleteAll();
+        lessonRepo.deleteAll();
         activityRepo.deleteAll();
         teacherRepo.deleteAll();
     }
 
     @Test
     void findByTeacherId() {
-        assertEquals(attendanceList,attendanceListRepo.findByTeacherId(teacher.getId(), PageRequest.of(0,1)).getContent().get(0));
+        assertEquals(lesson, lessonRepo.findByTeacherId(teacher.getId(), PageRequest.of(0,1)).getContent().get(0));
     }
 
 
     @Test
     void findByTeacherIdInDay() {
         LocalDate localDate = LocalDate.now().plusMonths(1);
-        AttendanceList newAttendanceList = new AttendanceList(activity, localDate);
-        attendanceListRepo.save(newAttendanceList);
+        Lesson newLesson = new Lesson(activity, localDate);
+        lessonRepo.save(newLesson);
 
-        assertEquals(newAttendanceList,attendanceListRepo.findByTeacherIdInDay(teacher.getId(), PageRequest.of(0,2),localDate).getContent().get(0));
+        assertEquals(newLesson, lessonRepo.findByTeacherIdInDay(teacher.getId(), PageRequest.of(0,2),localDate).getContent().get(0));
 
-        assertNotEquals(attendanceList,attendanceListRepo.findByTeacherIdInDay(teacher.getId(), PageRequest.of(0,2),localDate).getContent().get(0));
+        assertNotEquals(lesson, lessonRepo.findByTeacherIdInDay(teacher.getId(), PageRequest.of(0,2),localDate).getContent().get(0));
 
     }
 }

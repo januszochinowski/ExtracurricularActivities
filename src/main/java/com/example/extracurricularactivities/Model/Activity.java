@@ -1,11 +1,10 @@
 package com.example.extracurricularactivities.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
@@ -59,7 +58,8 @@ public class Activity {
     Teacher teacher;
 
     @OneToMany(mappedBy = "activity")
-    List<AttendanceList> attendanceList;
+    @JsonIgnore
+    List<Lesson> lesson;
 
 
 }
