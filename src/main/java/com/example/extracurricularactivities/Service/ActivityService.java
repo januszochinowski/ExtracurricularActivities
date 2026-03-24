@@ -4,7 +4,6 @@ import com.example.extracurricularactivities.Exception.AccessForbiddenActivity;
 import com.example.extracurricularactivities.Model.Activity;
 import com.example.extracurricularactivities.Repo.ActivityRepo;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
@@ -47,29 +45,79 @@ public class ActivityService {
         return repo.findById(id);
     }
 
+    /**
+     * Get Activities by Teacher ID
+     * @param teacherId ID of Teacher in wanted Activities
+     * @param page number of wanted pages
+     * @param pageSize number of elements in page
+     * @return List of founded Activities
+     */
     public List<Activity> getActivitiesByTeacherId(Long teacherId, int page, int pageSize){
         return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
     }
 
+    public List<Activity> getActivitiesByTeacherId(String date, int page, int pageSize, LocalDate afterDate){
+        return repo.findActivitiesByLocationStartingWith(date, PageRequest.of(page, pageSize),afterDate).getContent();
+    }
+
+    /**
+     * Get Activities which name start with
+     * @param name first letter/s of name
+     * @param page number of wanted pages
+     * @param pageSize number of elements in page
+     * @return List of founded Activities
+     */
     public List<Activity> getActivitiesByNameStartingWith(String name, int page, int pageSize){
         return repo.findActivitiesByNameStartingWith(name , PageRequest.of(page, pageSize)).getContent();
     }
 
+    public List<Activity> getActivitiesByNameStartingWith(String name, int page, int pageSize, LocalDate afterDate){
+        return repo.findActivitiesByNameStartingWith(name , PageRequest.of(page, pageSize),afterDate).getContent();
+    }
+
+
+
+    /**
+     * Get Activities which Location name starts with
+     * @param name first letter/s of location name
+     * @param page number of wanted pages
+     * @param pageSize number of elements in page
+     * @return List of founded Activities
+     */
     public List<Activity> getActivitiesByLocationStartingWith(String name, int page, int pageSize){
         return repo.findActivitiesByLocationStartingWith(name , PageRequest.of(page, pageSize)).getContent();
     }
 
-    public List<Activity> getActivitiesByDayOfWeek(String dayOfWeek, int page, int pageSize){
+    public List<Activity> getActivitiesByLocationStartingWith(String name, int page, int pageSize, LocalDate afterDate){
+        return repo.findActivitiesByLocationStartingWith(name , PageRequest.of(page, pageSize),afterDate).getContent();
+    }
+
+
+
+    /**
+     * Get Activities by day of week when they take place. It is assumed that Activity takes place only once a week on the same day.
+     * @param dayOfWeek
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public List<Activity> getActivitiesByDayOfWeek(String dayOfWeek, int page, int pageSize, Optional<LocalDate> afterDate){
         List<Activity> activities =  new ArrayList<>();
         Pageable pageable = PageRequest.of(page, pageSize);
         int pageCounter = 0;
 
-        while(pageable.getPageNumber() < pageable.getPageSize() && pageCounter < pageSize) {
-            List<Activity> list = repo.findAll(pageable)
-                    .stream()
-                    .filter(activity -> activity.getStartDate().getDayOfWeek().toString().equals(dayOfWeek))
-                    .toList();
+        while(pageable.isPaged() && pageCounter < pageSize) {
+            List<Activity> list = afterDate.isEmpty() ?
+                                                        repo.findAll(pageable).getContent()
+                                                        : repo.findAllAfterDate(pageable,afterDate.get()).getContent();
+
+           list =  list.stream()
+                    .filter(activity -> activity.getStartDate().getDayOfWeek().toString().equals(dayOfWeek.toUpperCase()))
+                   .toList();
+
             pageCounter += list.size();
+            if(list.isEmpty())
+                break;
             activities.addAll(list);
             pageable = pageable.next();
         }
@@ -77,6 +125,12 @@ public class ActivityService {
 
         return activities;
     }
+
+    public List<Activity> getActivitiesByDayOfWeek(String dayOfWeek, int page, int pageSize){
+        return getActivitiesByDayOfWeek(dayOfWeek, page, pageSize, Optional.empty());
+    }
+
+
 
 
     /**

@@ -24,7 +24,7 @@ public class Attendance {
     Student student;
 
     @ManyToOne
-    @MapsId("attendanceListId")
+    @MapsId("lessonId")
     @JoinColumn(name = "lesson_id", nullable = false)
     Lesson lesson;
 

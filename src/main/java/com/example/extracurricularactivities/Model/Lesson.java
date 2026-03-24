@@ -43,7 +43,7 @@ public class Lesson {
     @JoinColumn(name = "substitute_teacher_id")
     Teacher substituteTeacher;
 
-    @OneToMany(mappedBy = "lesson_id")
+    @OneToMany(mappedBy = "attendanceKey.lessonId")
     @JsonIgnore
     List<Attendance> attendances;
 
