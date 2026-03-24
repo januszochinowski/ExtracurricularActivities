@@ -53,7 +53,7 @@ public class Activity {
     @Column(nullable = false)
     LocalTime startTime;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(nullable = false, name = "teacher_id")
     Teacher teacher;
 

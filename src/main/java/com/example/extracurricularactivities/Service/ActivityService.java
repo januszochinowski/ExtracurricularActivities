@@ -2,6 +2,7 @@ package com.example.extracurricularactivities.Service;
 
 import com.example.extracurricularactivities.Exception.AccessForbiddenActivity;
 import com.example.extracurricularactivities.Model.Activity;
+import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.ActivityRepo;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
@@ -194,6 +195,11 @@ public class ActivityService {
      */
     public static StringBuilder firstLetterToUpper(StringBuilder builder){
        return builder.replace(0,1, String.valueOf(builder.charAt(0)).toUpperCase());
+    }
+
+    public void delete(long activityId, long senderId){
+        isActivityBelongNotToTeacher(activityId,senderId);
+        repo.deleteById(activityId);
     }
 
 

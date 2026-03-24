@@ -17,6 +17,7 @@ public interface ActivityRepo extends JpaRepository<Activity, Long> {
     @Query("SELECT a.teacher.id FROM Activity a JOIN  a.teacher WHERE a.id = :id")
     Long findTeacherId(long id);
 
+
     Page<Activity> findAll(Pageable pageable);
     Page<Activity> findActivitiesByTeacherId(Long teacherId, Pageable pageable);
     Page<Activity> findActivitiesByNameStartingWith(String name, Pageable pageable);
@@ -31,5 +32,7 @@ public interface ActivityRepo extends JpaRepository<Activity, Long> {
 
     @Query("SELECT a FROM Activity a  WHERE a.location LIKE %:name AND a.startDate > :afterDate")
     Page<Activity> findActivitiesByLocationStartingWith(String name, Pageable pageable,LocalDate afterDate );
+
+
 
 }
