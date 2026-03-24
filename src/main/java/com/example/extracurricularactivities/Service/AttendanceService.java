@@ -38,11 +38,22 @@ public class AttendanceService {
         return null;
     }
 
-    public void studentDropOut(long studentId, long lessonId) {
-        Student student = studentService.getStudentById(studentId).orElseThrow(() -> new EntityNotFoundException("Student with id " + studentId + " not found"));
-        repo.deleteByStudentIdAndLessonId(studentId,lessonId);
+    /**
+     * Drop out student form Activity
+     * @param studentId
+     * @param activityId
+     */
+    public void studentDropOut(long studentId, long activityId) {
+         Activity activity = activityService.getActivityById(activityId).orElseThrow(() -> new EntityNotFoundException("Activity with id " + activityId + " not found"));
+         activity.getLesson().forEach( lesson -> {repo.deleteByStudentIdAndLessonId(studentId,lesson.getId()); });
     }
 
+    /**
+     * Mark student attendance in selected Lesson
+     * @param studentId student ID
+     * @param lessonId lesson ID
+     * @param isAbsent set up student attendance (true = present, false = absent)
+     */
     public void markStudentAbsent(long studentId, long lessonId, boolean isAbsent) {
         Attendance attendance = repo.findByStudentIdAndLessonId(studentId,lessonId)
                 .orElseThrow(() -> new EntityNotFoundException("Attendance with  student id " + studentId + "and lesson id" + lessonId +" not found"));
@@ -50,6 +61,11 @@ public class AttendanceService {
         repo.save(attendance);
     }
 
+    /**
+     * Sing up selected student to Activity
+     * @param activity selected Activity (object)
+     * @param userId ID of a selected student
+     */
     @Transactional
     public void signUpToActivity(Activity activity, long userId) {
         Student student = studentService.getStudentById(userId).orElseThrow(() -> new EntityNotFoundException("Student with id: " + userId + " not found"));

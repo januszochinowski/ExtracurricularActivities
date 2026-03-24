@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
@@ -19,10 +20,12 @@ public class ActivityService {
 
     private final ActivityRepo repo;
     private final TeachersService teacherService;
+    private final LessonService lessonSabsentervice;
 
-    public ActivityService(ActivityRepo repo, TeachersService teacherService) {
+    public ActivityService(ActivityRepo repo, TeachersService teacherService, LessonService lessonSabsentervice) {
         this.repo = repo;
         this.teacherService = teacherService;
+        this.lessonSabsentervice = lessonSabsentervice;
     }
 
     /**
@@ -30,9 +33,11 @@ public class ActivityService {
      * @param activity activity to add
      * @param teacherId Teacher who adds activity
      */
+    @Transactional
     public void addActivity(Activity activity, Long teacherId){
         activity.setTeacher(teacherService.getTeacherById(teacherId).orElseThrow(()->new EntityNotFoundException("Teacher not found")));
         repo.save(activity);
+        lessonSabsentervice.create(activity);
     }
 
 
