@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,7 @@ public class ActivityService {
     @Transactional
     public void addActivity(Activity activity, Long teacherId){
         activity.setTeacher(teacherService.getTeacherById(teacherId).orElseThrow(()->new EntityNotFoundException("Teacher not found")));
+        activity.setStartTime(LocalTime.parse(activity.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
         repo.save(activity);
         lessonSabsentervice.create(activity);
     }
@@ -62,8 +65,8 @@ public class ActivityService {
         return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
     }
 
-    public List<Activity> getActivitiesByTeacherId(String date, int page, int pageSize, LocalDate afterDate){
-        return repo.findActivitiesByLocationStartingWith(date, PageRequest.of(page, pageSize),afterDate).getContent();
+    public List<Activity> getActivitiesByTeacherId(Long teacherId, int page, int pageSize, LocalDate afterDate){
+        return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
     }
 
     /**
@@ -197,10 +200,6 @@ public class ActivityService {
        return builder.replace(0,1, String.valueOf(builder.charAt(0)).toUpperCase());
     }
 
-    public void delete(long activityId, long senderId){
-        isActivityBelongNotToTeacher(activityId,senderId);
-        repo.deleteById(activityId);
-    }
 
 
 

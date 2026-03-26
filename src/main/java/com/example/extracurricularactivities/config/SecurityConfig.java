@@ -3,6 +3,7 @@ package com.example.extracurricularactivities.config;
 import com.example.extracurricularactivities.Service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,6 +44,9 @@ public class SecurityConfig {
                         .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/teacher/**").hasRole("TEACHER")
+                                .requestMatchers(HttpMethod.POST,"/activity/**").hasAnyRole("TEACHER","ADMIN")
+                                .requestMatchers(HttpMethod.PATCH,"/activity/**").hasAnyRole("TEACHER","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/activity/**").hasAnyRole("TEACHER","ADMIN")
                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -90,7 +90,7 @@ class LessonServiceTest {
 
     @Test
     @Transactional
-    void getAllMy() {
+    void getAllMyTeacher() {
         Teacher teacher1 = RandomUserFactory.getRandomTeacher(false);
         teacherService.addTeacher(teacher1);
 
@@ -103,14 +103,14 @@ class LessonServiceTest {
         repo.save(lesson);
         repo.save(lesson1);
 
-        assertArrayEquals( new Lesson[]{lesson},service.getAllMy(0,3,teacher.getId()).toArray());
-        assertArrayEquals( new Lesson[]{lesson1}, service.getAllMy(0,3,teacher1.getId()).toArray());
+        assertArrayEquals( new Lesson[]{lesson},service.getAllMyTeacher(0,3,teacher.getId()).toArray());
+        assertArrayEquals( new Lesson[]{lesson1}, service.getAllMyTeacher(0,3,teacher1.getId()).toArray());
 
     }
 
     @Test
     @Transactional
-    void GetAllMyWithDate() {
+    void GetAllMyTeacherWithDate() {
         Teacher teacher1 = RandomUserFactory.getRandomTeacher(false);
         teacherService.addTeacher(teacher1);
 
@@ -126,8 +126,8 @@ class LessonServiceTest {
         repo.save(lesson1);
         repo.save(lesson2);
 
-        assertArrayEquals(new Lesson[]{lesson1},service.getAllMy(0,10,teacher1.getId(),date).toArray());
-        assertArrayEquals(new Lesson[]{lesson2}, service.getAllMy(0,10,teacher.getId(),date2).toArray());
+        assertArrayEquals(new Lesson[]{lesson1},service.getAllMyTeacher(0,10,teacher1.getId(),date).toArray());
+        assertArrayEquals(new Lesson[]{lesson2}, service.getAllMyTeacher(0,10,teacher.getId(),date2).toArray());
 
     }
 

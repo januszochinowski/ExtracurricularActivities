@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
@@ -53,12 +54,13 @@ public class Activity {
     @Column(nullable = false)
     LocalTime startTime;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "teacher_id")
     Teacher teacher;
 
-    @OneToMany(mappedBy = "activity")
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
     @JsonIgnore
+    @ToString.Exclude
     List<Lesson> lesson;
 
 

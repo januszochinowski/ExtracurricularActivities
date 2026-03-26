@@ -1,13 +1,14 @@
 package com.example.extracurricularactivities.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -31,4 +32,9 @@ public class Teacher extends User {
 
     @Column(nullable = false)
     Boolean isAdmin;
+
+    @OneToMany(mappedBy = "teacher",cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ToString.Exclude
+    List<Activity> activities;
 }

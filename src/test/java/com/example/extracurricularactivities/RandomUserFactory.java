@@ -6,6 +6,7 @@ import com.example.extracurricularactivities.Model.Teacher;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 /**
@@ -49,7 +50,7 @@ public abstract class RandomUserFactory {
         activity.setEndDate(LocalDate.now());
         activity.setDuration(10);
         activity.setMaxNumberOfStudents(10);
-        activity.setStartTime(LocalTime.now());
+        activity.setStartTime(LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))));
         activity.setTeacher(teacher);
         return activity;
     }

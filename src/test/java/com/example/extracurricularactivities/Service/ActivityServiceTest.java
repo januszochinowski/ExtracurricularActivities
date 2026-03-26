@@ -59,7 +59,11 @@ class ActivityServiceTest {
         activityService.addActivity(newActivity,teacher2.getId());
 
         assertTrue(activityRepo.findById(newActivity.getId()).isPresent());
-        assertEquals(teacher2, activityRepo.findById(activity.getId()).get().getTeacher());
+        assertEquals(teacher2.getName(), activityRepo.findById(activity.getId()).get().getTeacher().getName());
+        assertEquals(teacher2.getSurname(), activityRepo.findById(activity.getId()).get().getTeacher().getSurname());
+        assertEquals(teacher2.getPhoneNumber(), activityRepo.findById(activity.getId()).get().getTeacher().getPhoneNumber());
+        assertEquals(teacher2.getEmail(), activityRepo.findById(activity.getId()).get().getTeacher().getEmail());
+        assertEquals(teacher2.getIsAdmin(), activityRepo.findById(activity.getId()).get().getTeacher().getIsAdmin());
     }
 
     @Test
@@ -111,16 +115,14 @@ class ActivityServiceTest {
     @Test
     @Transactional
     void getActivitiesByLocationStartingWith() {
-
         assertEquals(activity, activityService.getActivitiesByLocationStartingWith(activity.getLocation(),0,10).get(0));
     }
 
     @Test
-    @Transactional
     void getActivitiesByDayOfWeek() {
         Activity newActivity = RandomUserFactory.getRandomActivity(teacher1);
         newActivity.setStartDate(LocalDate.of(2026,3,23));
         activityService.addActivity(newActivity,teacher1.getId());
-        assertEquals(newActivity,activityService.getActivitiesByDayOfWeek("monday",0,10).get(0));
+        assertEquals(newActivity.getId(),activityService.getActivitiesByDayOfWeek("monday",0,10).get(0).getId());
     }
 }

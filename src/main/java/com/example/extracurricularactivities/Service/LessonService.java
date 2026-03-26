@@ -63,7 +63,7 @@ public class LessonService {
      * @param teacherId ID of selected teacher
      * @return list of founded Lesson
      */
-    public List<Lesson> getAllMy(int page, int size, long teacherId){
+    public List<Lesson> getAllMyTeacher(int page, int size, long teacherId){
         return repo.findByTeacherId(teacherId,PageRequest.of(page,size)).getContent();
     }
 
@@ -75,7 +75,7 @@ public class LessonService {
      * @param date of a wanted lesson
      * @return list of founded Lesson
      */
-    public List<Lesson> getAllMy(int page, int size, long teacherId, LocalDate date){
+    public List<Lesson> getAllMyTeacher(int page, int size, long teacherId, LocalDate date){
         return repo.findByTeacherIdInDay(teacherId,PageRequest.of(page,size),date).getContent();
     }
 
