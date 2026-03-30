@@ -23,14 +23,14 @@ public interface ActivityRepo extends JpaRepository<Activity, Long> {
     Page<Activity> findActivitiesByNameStartingWith(String name, Pageable pageable);
     Page<Activity> findActivitiesByLocationStartingWith(String name, Pageable pageable);
 
-    @Query("SELECT  a FROM Activity  a WHERE a.startDate > :afterDate")
+    @Query("SELECT  a FROM Activity  a WHERE a.startDate >= :afterDate")
     Page<Activity> findAllAfterDate(Pageable pageable, LocalDate afterDate);
     Page<Activity> findActivitiesByTeacherIdAfterOrStartDate(Long teacherId, Pageable pageable, LocalDate AfterDate);
 
-    @Query("SELECT a FROM Activity a  WHERE a.name LIKE %:name AND a.startDate > :afterDate")
+    @Query("SELECT a FROM Activity a  WHERE a.name LIKE %:name AND a.startDate >= :afterDate")
     Page<Activity> findActivitiesByNameStartingWith(String name, Pageable pageable, LocalDate afterDate);
 
-    @Query("SELECT a FROM Activity a  WHERE a.location LIKE %:name AND a.startDate > :afterDate")
+    @Query("SELECT a FROM Activity a  WHERE a.location LIKE %:name AND a.startDate >= :afterDate")
     Page<Activity> findActivitiesByLocationStartingWith(String name, Pageable pageable,LocalDate afterDate );
 
 

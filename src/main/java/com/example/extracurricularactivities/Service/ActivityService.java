@@ -176,6 +176,7 @@ public class ActivityService {
         Activity activity  = repo.findById(activityId).orElseThrow( () -> new EntityNotFoundException("Activity with id " + activityId + " not found!") );
         isActivityBelongNotToTeacher(activity,senderId);
         activity.getClass().getDeclaredMethod("set" +  firstLetterToUpper(partName),String.class).invoke(activity,newValue);
+        repo.save(activity);
     }
 
     /**

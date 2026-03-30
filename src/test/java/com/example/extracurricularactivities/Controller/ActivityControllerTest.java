@@ -11,6 +11,7 @@ import com.example.extracurricularactivities.Service.TeachersService;
 import com.google.gson.Gson;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ class ActivityControllerTest {
     String token;
     Teacher teacher;
     Activity activity;
+    Activity activity2;
 
     Gson gson =  new Gson();
     @Autowired
@@ -60,8 +62,12 @@ class ActivityControllerTest {
     void setUp() {
         teacher = RandomUserFactory.getRandomTeacher(false);
        activity = RandomUserFactory.getRandomActivity(teacher);
+       activity2 =RandomUserFactory.getRandomActivity(teacher);
        teachersService.addTeacher(teacher);
        activityService.addActivity(activity,teacher.getId());
+       activityService.addActivity(activity2,teacher.getId());
+
+       token = jwtService.generateToken(teacher.getId().toString());
     }
 
     @AfterEach
@@ -77,44 +83,126 @@ class ActivityControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Activity.class)
-                .isEqualTo(activity);
+                .value( a -> {
+                    assertEquals(a.getId(), activity.getId());
+                });
     }
 
     @Test
     void getActivitiesByTeacherId() {
 
-    String response = client.get().uri("/activity?byTeacher="+teacher.getId())
+    client.get().uri("/activity/byTeacher?id="+teacher.getId())
                 .header("Authorization", "Bearer " + token)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
-                .returnResult().getResponseBody();
+                .value( s ->
+                        {
+                                assertTrue( s.contains(activity.getName()));
+                                assertTrue(s.contains(activity2.getName()));
+                        }
+                );
 
-    assertTrue(response.contains(activity.getName()));
 
     }
 
     @Test
     void getActivitiesByName() {
+
+        client.get().uri("/activity/byName?name="+activity.getName())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
+
+        client.get().uri("/activity/byName?name="+activity.getName()+"afterDate="+activity.getStartDate().minusDays(1))
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
+
+
     }
 
     @Test
     void getActivitiesByLocation() {
+        client.get().uri("/activity/byLocation?location="+activity.getLocation())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
+
+        client.get().uri("/activity/byLocation?location="+activity.getLocation()+"&afterDate="+activity.getStartDate().minusDays(1))
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
+
+
     }
 
     @Test
     void getActivitiesByDayOfWeek() {
+        client.get().uri("/activity/byDayOfWeek?day="+activity.getStartDate().getDayOfWeek())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
+
+        client.get().uri("/activity/byDayOfWeek?day="+activity.getStartDate().getDayOfWeek()+"&afterDate="+activity.getStartDate().minusDays(1))
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value( response -> assertTrue(response.contains(activity.getId().toString())));
     }
 
     @Test
     void updateActivity() {
+        activity.setLocation("Updated location");
+
+        client.put().uri("/activity")
+                .header("Authorization", "Bearer " + token)
+                .body(activity)
+                .exchange()
+                .expectStatus().isOk();
+
+        assertEquals(activity.getLocation(), activityRepo.findById(activity.getId()).get().getLocation());
     }
 
     @Test
     void update() {
+        client.patch().uri("/activity?part=name&value=updated&id="+activity.getId())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk();
+
+        client.get().uri("/activity?id="+activity.getId())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Activity.class)
+                .value(Assertions::assertNotNull)
+                .value( a -> assertEquals("update", a.getLocation()));
+
     }
 
     @Test
     void deleteActivity() {
+        client.delete().uri("/activity?id="+activity.getId())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk();
+
+        client.get().uri("/activity?id="+activity.getId())
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isNotFound();
+
     }
 }

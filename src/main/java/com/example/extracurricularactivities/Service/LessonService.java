@@ -5,8 +5,10 @@ import com.example.extracurricularactivities.Model.Lesson;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.LessonRepo;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.annotations.ColumnTransformers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,6 +30,7 @@ public class LessonService {
      * Creat Lesson in every week between startDate and endDate in a database for new Activity
      * @param activity new Activity
      */
+    @Transactional
     public void create(Activity activity){
         for(LocalDate date = activity.getStartDate(); date.isBefore(activity.getEndDate()); date = date.plusDays(7)){
             repo.save(new Lesson(activity,date));

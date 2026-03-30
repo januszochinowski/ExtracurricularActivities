@@ -6,6 +6,7 @@ import com.example.extracurricularactivities.Service.JWTService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +25,7 @@ public class ActivityController {
         this.service = service;
         this.jwtService = jwtService;
     }
+
 
     @GetMapping()
     public ResponseEntity<Activity> getActivityById(@RequestParam long id){
@@ -68,11 +70,20 @@ public class ActivityController {
         return ResponseEntity.ok(service.getActivitiesByDayOfWeek(day, page, pageSize,afterDate));
     }
 
+    @PutMapping("/add")
+    public ResponseEntity<String> add(@RequestBody Activity activity, @RequestHeader("Authorization") String header){
+        long id = Long.parseLong(jwtService.extractIdFromHeader(header));
+        service.addActivity(activity,id);
+        return ResponseEntity.ok("Activity  has been added");
+    }
+
     @PutMapping()
     public ResponseEntity<Activity> updateActivity(@RequestBody Activity activity, @RequestHeader("Authorization")  String header){
         service.updateAll(activity,Long.parseLong(jwtService.extractIdFromHeader(header)));
         return ResponseEntity.ok(activity);
     }
+
+
 
     @PatchMapping()
     public ResponseEntity<String> update(@RequestParam(name= "part") StringBuilder partName,

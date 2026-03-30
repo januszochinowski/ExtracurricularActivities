@@ -41,7 +41,7 @@ public class StudentService {
 
 
     /**
-     * Check if there is  another student with the same details: childName, childSurname, childBirthDate (all 3)
+     * Check if there is another student with the same details: childName, childSurname, childBirthDate (all 3)
      * @param childName <- childName to check
      * @param childSurname <- childSurname to check
      * @param childAge <- childBirthDate to check

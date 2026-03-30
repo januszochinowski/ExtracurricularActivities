@@ -12,7 +12,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,11 +46,11 @@ public class SecurityConfig {
                         .formLogin(AbstractHttpConfigurer::disable)
                         .httpBasic(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/teacher/**").hasRole("TEACHER")
-                                .requestMatchers(HttpMethod.POST,"/activity/**").hasAnyRole("TEACHER","ADMIN")
-                                .requestMatchers(HttpMethod.PATCH,"/activity/**").hasAnyRole("TEACHER","ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/activity/**").hasAnyRole("TEACHER","ADMIN")
+                                .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                                .requestMatchers("/teacher/**").hasAnyAuthority("TEACHER","ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
+                                .requestMatchers(HttpMethod.PATCH,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,4 +69,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+
 }

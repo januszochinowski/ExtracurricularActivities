@@ -1,5 +1,6 @@
 package com.example.extracurricularactivities.Model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -62,6 +63,19 @@ public class Activity {
     @JsonIgnore
     @ToString.Exclude
     List<Lesson> lesson;
+
+    @JsonCreator
+    public Activity(String name, String description, String  location, int minAge, int maxAge, LocalDate startDate, LocalDate endDate, int duration) {
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.minAge = minAge;
+        this.maxAge = maxAge;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.duration = duration;
+        teacher = null;
+    }
 
 
 }
