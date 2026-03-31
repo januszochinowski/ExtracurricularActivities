@@ -30,12 +30,9 @@ public class AttendanceService {
         repo.save(attendance);
     }
 
-    public List<Attendance> getAll(Lesson lesson) {
+    public List<Attendance> getAll(long lessonId) {
+        Lesson lesson = lessonService.get(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson with id:" + lessonId + " not found"));
         return lesson.getAttendances();
-    }
-
-    public Attendance getOne(AttendanceKey attendanceKey) {
-        return null;
     }
 
     /**
