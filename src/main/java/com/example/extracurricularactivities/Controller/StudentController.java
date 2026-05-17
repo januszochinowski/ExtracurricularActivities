@@ -16,12 +16,12 @@ import java.lang.reflect.InvocationTargetException;
 
 @RestController
 @RequestMapping("/studentData")
-public class MangeStudentDataController {
+public class StudentController {
 
     private final StudentService studentService;
     private final JWTService jwtService;
 
-    public MangeStudentDataController(StudentService studentService, JWTService jwtService) {
+    public StudentController(StudentService studentService, JWTService jwtService) {
         this.studentService = studentService;
         this.jwtService = jwtService;
     }
