@@ -26,6 +26,7 @@ public class ActivityController {
         this.jwtService = jwtService;
     }
 
+    //TODO Zrobić filtrowanie po dacię
 
     @GetMapping()
     public ResponseEntity<Activity> getActivityById(@RequestParam long id){

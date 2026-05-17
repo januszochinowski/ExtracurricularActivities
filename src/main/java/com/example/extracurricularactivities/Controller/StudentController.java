@@ -57,7 +57,7 @@ public class StudentController {
      * @return ok status if update completed successfully
      */
     @PatchMapping("/{part}")
-    public ResponseEntity<String> updateStudentData(@PathVariable("part") StringBuilder part,
+    public ResponseEntity<String> updateStudentData(@PathVariable StringBuilder part,
                                                     @RequestParam("value") String newValue,
                                                     @RequestHeader("Authorization") String header) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         part.replace(0,1, String.valueOf(part.charAt(0)).toUpperCase());
