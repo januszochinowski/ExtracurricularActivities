@@ -41,7 +41,7 @@ public class AdminController {
     public ResponseEntity<List<? extends  User>> getAllUser(@RequestParam(required = false,defaultValue = "0") int page,
                                                  @RequestParam int size,
                                                  @RequestParam(required = false,value="role", defaultValue = "student") String role,
-                                                 @RequestParam(required = false, value="start", defaultValue = "") String startWith,
+                                                 @RequestParam(required = false, value="value", defaultValue = "") String startWith,
                                                  @RequestParam(required = false, value="part") String partName) {
 
         if(startWith.isEmpty()) {
@@ -54,12 +54,12 @@ public class AdminController {
             }
 
         }else {
-            if (role.equals("student")) {
+            if (role.equalsIgnoreCase("student")) {
                 return ResponseEntity.ok(studentService.getStudentsStartWith(partName, startWith, size, page));
-            } else if (role.equals("teacher") || role.equals("admin") ) {
+            } else if (role.equalsIgnoreCase("teacher") || role.equalsIgnoreCase("admin") ) {
                 return ResponseEntity.ok(teacherService.getTeacherStartWith(partName, startWith, size, page));
             } else
-                throw new NoSuchElementException("Invalid  partName");
+                throw new NoSuchElementException("Invalid  role");
         }
     }
 
@@ -130,19 +130,19 @@ public class AdminController {
     @PatchMapping("/{role}/{part}")
     public ResponseEntity<String> updateTeacher(@RequestParam long id,
                                                 @RequestParam("value") String newValue,
-                                                @PathVariable("role")  String role,
+                                                @PathVariable String role,
                                                 @PathVariable("part") StringBuilder partName) throws NoSuchMethodException {
         try {
 
-            if(role.equals("teacher") || role.equals("admin")) {
+            if(role.equalsIgnoreCase("teacher") || role.equalsIgnoreCase("admin")) {
                 teacherService.update(id, partName, newValue);
-            }else if(role.equals("student")) {
+            }else if(role.equalsIgnoreCase("student")) {
                 studentService.updateStudent(id, partName, newValue);
             }else
                 return ResponseEntity.badRequest().body("Invalid role");
 
         }catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e){
-            throw new NoSuchMethodException(partName + "is wrong part name");
+            throw new NoSuchMethodException(partName + " is wrong part name");
         }
 
         return new ResponseEntity<>("Teacher successfully updated ", HttpStatus.OK);

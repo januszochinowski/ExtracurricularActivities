@@ -2,11 +2,9 @@ package com.example.extracurricularactivities.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
@@ -37,4 +35,10 @@ public class Teacher extends User {
     @JsonIgnore
     @ToString.Exclude
     List<Activity> activities;
+
+    public void setPassword(String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+        this.password = password;
+    }
 }

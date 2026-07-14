@@ -40,16 +40,22 @@ public class AttendanceController {
 
     @PatchMapping()
     public ResponseEntity<String> markStudent(@RequestParam long studentId,
-                                              @RequestParam boolean absent,
+                                              @RequestParam boolean present,
                                               @RequestParam long lessonId){
-        service.markStudentAbsent(studentId,lessonId,absent);
-        return ResponseEntity.ok("Mark student" + (absent?  "absent" : "present") +  "from activity " +  studentId);
+        service.markStudentAbsent(studentId,lessonId,present);
+        return ResponseEntity.ok("Mark student" + (present?  "present" : "absent") +  "from activity " +  studentId);
     }
 
     @PostMapping()
-    public ResponseEntity<String> sinUp(@RequestParam("activity") long activityId, @RequestHeader("Authorization")  String header){
+    public ResponseEntity<String> sinUp(@RequestParam("activity") Long activityId, @RequestHeader("Authorization")  String header){
         service.signUpToActivity(activityId,Long.parseLong(jwtService.extractIdFromHeader(header)));
         return ResponseEntity.ok("Sign up to activity " +  activityId);
+    }
+
+    @PostMapping("/byTeacher")
+    public ResponseEntity<String> singUpByTeacher(@RequestParam("activity") Long activityId,@RequestParam("student") Long studentId){
+        service.signUpToActivity(activityId,studentId);
+        return ResponseEntity.ok("Sing up student with id " + studentId + "to activity " + activityId);
     }
 
 

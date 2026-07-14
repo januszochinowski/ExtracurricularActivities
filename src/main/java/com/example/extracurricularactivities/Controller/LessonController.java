@@ -42,10 +42,23 @@ public class LessonController {
     @GetMapping("/byTeacher")
     public ResponseEntity<List<Lesson>> getLessonByTeacher(@RequestParam int page,
                                                            @RequestParam int size,
-                                                           @RequestParam(name="teacher") long teacherId,
-                                                           @RequestParam(required = false) Optional<LocalDate> date){
+                                                           @RequestParam(required = false) Optional<LocalDate> date,
+                                                           @RequestHeader("Authorization") String header){
+        long teacherId = Long.parseLong(jWTService.extractIdFromHeader(header));
         return date.map(localDate -> ResponseEntity.ok(lessonService.getAllMyTeacher(page, size, teacherId, localDate)))
                 .orElseGet(() -> ResponseEntity.ok(lessonService.getAllMyTeacher(page, size, teacherId)));
+    }
+
+    /**
+     * Lessons on date the user is enrolled
+     * @param date
+     * @return
+     */
+    @GetMapping("/byStudent")
+    public ResponseEntity<List<Lesson>> getLessonByStudent(@RequestHeader("Authorization") String header,
+                                                           @RequestParam LocalDate date) {
+        long studentId = Long.parseLong(jWTService.extractIdFromHeader(header));
+        return  ResponseEntity.ok(lessonService.getStudentLessonsInDate(studentId,date));
     }
 
     @PutMapping
@@ -75,15 +88,19 @@ public class LessonController {
 
     @PatchMapping("/substitute")
     public ResponseEntity<String> updateLessonSubstitute(@RequestParam long id,
-                                                         @RequestParam(name = "value") LocalTime newValue,
-                                                         @RequestHeader("Authorization") String header) {
-        lessonService.takeSubstitute(id, Long.parseLong(jWTService.extractIdFromHeader(header)));
+                                                         @RequestParam (name="value") long  substituteTeacherId){
+        lessonService.takeSubstitute(id,substituteTeacherId);
         return ResponseEntity.ok("Update lesson id "+id);
     }
 
     @PatchMapping("/cancel")
-    public ResponseEntity<String> updateLessonCancel(@RequestParam long id) {
-        lessonService.cancel(id);
-        return ResponseEntity.ok("Cancel lesson id "+id);
+    public ResponseEntity<String> updateLessonCancel(@RequestParam long id,
+                                                     @RequestParam( required = false) Optional<Boolean> value) {
+
+        lessonService.cancel(id,value.orElse(true));
+        return ResponseEntity.ok( value.isEmpty() ?  "Cancel lesson id "+id : "Uncanceled lesson" + id );
     }
+
+
+
 }

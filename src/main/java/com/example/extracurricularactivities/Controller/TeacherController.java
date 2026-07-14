@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/teacher")
 public class TeacherController {

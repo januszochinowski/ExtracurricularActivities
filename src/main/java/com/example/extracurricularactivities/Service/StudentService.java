@@ -93,6 +93,11 @@ public class StudentService {
 
 
     public void updateStudent(Long id, StringBuilder partName, String newValue) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if(partName.toString().equalsIgnoreCase("name")){
+            partName = new StringBuilder("parentName");
+        }else if (partName.toString().equalsIgnoreCase("surname")){
+            partName = new StringBuilder("parentSurname");
+        }
         this.getClass().getDeclaredMethod("update" + ActivityService.firstLetterToUpper(partName), Long.class,String.class).invoke(this,id, newValue);
     }
 
@@ -104,9 +109,10 @@ public class StudentService {
      */
     @Transactional
     public void  updateStudent(Long id,Student student){
-        if(isStudentNotUniq(student)) throw new NotUniqDataException();
+      //  if(isStudentNotUniq(student)) throw new NotUniqDataException();
 
         student.setId(id);
+        student.setPassword(encoder.encode(student.getPassword()));
         repo.save(student);
     }
 
@@ -166,6 +172,25 @@ public class StudentService {
         if(isStudentNotUniq(student.getChildName(),student.getChildSurname(),Integer.parseInt(childAge))) throw new NotUniqDataException();
         repo.updateStudentChildAge(id, Integer.parseInt(childAge));
     }
+
+    @Transactional
+    public void updatePassword(Long id, String password){
+        password = encoder.encode(password);
+        repo.updateStudentPassword(id,password);
+    }
+
+    @Transactional
+    public void updatePhoneNumber(Long id, String phoneNumber){
+        repo.updateStudentPhoneNumber(id,phoneNumber);
+    }
+
+    @Transactional
+    public void updateEmail(Long id, String email){
+        repo.updateStudentEmail(id,email);
+    }
+
+
+
 
 
 

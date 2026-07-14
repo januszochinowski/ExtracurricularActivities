@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Controller for operation with student data
  */
-
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/studentData")
 public class StudentController {

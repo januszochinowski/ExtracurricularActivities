@@ -1,12 +1,15 @@
 package com.example.extracurricularactivities.config;
 
 
+import com.example.extracurricularactivities.Exception.GlobalExceptionHandler;
 import com.example.extracurricularactivities.Service.CustomUserDetailsService;
 import com.example.extracurricularactivities.Service.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +28,7 @@ public class JWTFilter extends OncePerRequestFilter {
     JWTService jwtService;
     ApplicationContext context;
     private String id;
+    private final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
 
 
 
@@ -62,6 +66,7 @@ try {
 }catch (Exception e){
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.getWriter().write(e.getMessage());
+    logger.info("Access denied");
 }
 
 

@@ -3,7 +3,10 @@ package com.example.extracurricularactivities.Controller;
 import com.example.extracurricularactivities.Model.Activity;
 import com.example.extracurricularactivities.Service.ActivityService;
 import com.example.extracurricularactivities.Service.JWTService;
+import com.example.extracurricularactivities.config.JWTFilter;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/activity")
 public class ActivityController {
@@ -25,8 +29,6 @@ public class ActivityController {
         this.service = service;
         this.jwtService = jwtService;
     }
-
-    //TODO Zrobić filtrowanie po dacię
 
     @GetMapping()
     public ResponseEntity<Activity> getActivityById(@RequestParam long id){
@@ -43,8 +45,19 @@ public class ActivityController {
         return ResponseEntity.ok(service.getActivitiesByTeacherId(teacherId, page, pageSize));
     }
 
+
+    @GetMapping("/byTeacherSurname")
+    public ResponseEntity<List<Activity>> getActivitiesByTeacherSurname(@RequestParam(name="teacher") long id  ,
+                                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                                        @RequestParam(required = false, defaultValue = "10") int pageSize,
+                                                                        @RequestParam(required = false)LocalDate afterDate){
+        if(afterDate != null)
+            return ResponseEntity.ok(service.getActivitiesByTeacherId(id ,page,pageSize, afterDate));
+        return ResponseEntity.ok(service.getActivitiesByTeacherId(id, page, pageSize));
+    }
+
     @GetMapping("/byName")
-    public ResponseEntity<List<Activity>> getActivitiesByName(@RequestParam String name,
+    public ResponseEntity<List<Activity>> getActivitiesByName(@RequestParam(name="text") String name,
                                                               @RequestParam(required = false, defaultValue = "0") int page,
                                                               @RequestParam(required = false, defaultValue = "10") int pageSize,
                                                               @RequestParam(required = false)LocalDate afterDate){
@@ -54,7 +67,7 @@ public class ActivityController {
     }
 
     @GetMapping("/byLocation")
-    public ResponseEntity<List<Activity>> getActivitiesByLocation(@RequestParam String location,
+    public ResponseEntity<List<Activity>> getActivitiesByLocation(@RequestParam(name="text") String location,
                                                                   @RequestParam(required = false, defaultValue = "0") int page,
                                                                   @RequestParam(required = false, defaultValue = "10") int pageSize,
                                                                   @RequestParam(required = false)LocalDate afterDate){
@@ -64,7 +77,7 @@ public class ActivityController {
     }
 
     @GetMapping("/byDayOfWeek")
-    public ResponseEntity<List<Activity>> getActivitiesByDayOfWeek(@RequestParam String day,
+    public ResponseEntity<List<Activity>> getActivitiesByDayOfWeek(@RequestParam(name="text") String day,
                                                                    @RequestParam(required = false, defaultValue = "0") int page,
                                                                    @RequestParam(required = false, defaultValue = "10") int pageSize,
                                                                    @RequestParam(required = false) Optional<LocalDate> afterDate){

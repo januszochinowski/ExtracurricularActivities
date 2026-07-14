@@ -32,5 +32,7 @@ public class Attendance {
     public Attendance(Student student, Lesson lesson){
         this.student = student;
         this.lesson = lesson;
+        isPresent = false;
+        attendanceKey = new AttendanceKey(student.id,lesson.getId());
     }
 }

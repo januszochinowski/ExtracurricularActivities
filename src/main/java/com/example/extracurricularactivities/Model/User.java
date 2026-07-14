@@ -9,8 +9,9 @@ import lombok.Data;
 public  class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     protected Long id;
+
 
     @Column(nullable = false)
     protected String password;

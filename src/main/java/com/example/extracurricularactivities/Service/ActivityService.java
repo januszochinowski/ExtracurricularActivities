@@ -1,10 +1,12 @@
 package com.example.extracurricularactivities.Service;
 
+import com.example.extracurricularactivities.Controller.ActivityController;
 import com.example.extracurricularactivities.Exception.AccessForbiddenActivity;
 import com.example.extracurricularactivities.Model.Activity;
-import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.ActivityRepo;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,13 @@ public class ActivityService {
 
     private final ActivityRepo repo;
     private final TeachersService teacherService;
-    private final LessonService lessonSabsentervice;
+    private final LessonService lessonSubservience;
+    private final Logger logger = LoggerFactory.getLogger(ActivityService.class);
 
-    public ActivityService(ActivityRepo repo, TeachersService teacherService, LessonService lessonSabsentervice) {
+    public ActivityService(ActivityRepo repo, TeachersService teacherService, LessonService lessonSubservience) {
         this.repo = repo;
         this.teacherService = teacherService;
-        this.lessonSabsentervice = lessonSabsentervice;
+        this.lessonSubservience = lessonSubservience;
     }
 
     /**
@@ -40,8 +43,20 @@ public class ActivityService {
     public void addActivity(Activity activity, Long teacherId){
         activity.setTeacher(teacherService.getTeacherById(teacherId).orElseThrow(()->new EntityNotFoundException("Teacher not found")));
         activity.setStartTime(LocalTime.parse(activity.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm"))));
+
+        for (LocalDate date = activity.getStartDate(); date.isBefore(activity.getEndDate()); date = date.plusDays(7)){
+            if(!isTeacherFree(teacherId,date, activity.getStartTime(), activity.getDuration()))  throw new EntityNotFoundException("Teacher has classes at that time");
+        }
+
         repo.save(activity);
-        lessonSabsentervice.create(activity);
+        lessonSubservience.create(activity);
+        logger.info("Activity with id {}was add", activity.getId());
+    }
+
+    public boolean isTeacherFree(Long id, LocalDate date, LocalTime startTime, int duration ){
+            return lessonSubservience.getAllMyTeacher(0,100,id,date).stream()
+                    .noneMatch(l -> l.getStartTime().plusMinutes(l.getActivity().getDuration()).isAfter(startTime)
+                            && l.getStartTime().isBefore(startTime.plusMinutes(duration)));
     }
 
 
@@ -65,8 +80,19 @@ public class ActivityService {
         return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
     }
 
+
     public List<Activity> getActivitiesByTeacherId(Long teacherId, int page, int pageSize, LocalDate afterDate){
         return repo.findActivitiesByTeacherId(teacherId, PageRequest.of(page, pageSize)).getContent();
+    }
+
+
+
+    public List<Activity> getActivitiesByTeacherSurname(String surname, int page, int pageSize){
+        return repo.findActivitiesByTeacherSurname(surname,page,pageSize);
+    }
+
+    public List<Activity> getActivitiesByTeacherSurname(String surname, int page, int pageSize, LocalDate afterDate){
+        return repo.findActivitiesByTeacherSurname(surname,page,pageSize, afterDate);
     }
 
     /**
@@ -162,6 +188,7 @@ public class ActivityService {
 
         isActivityBelongNotToTeacher(id, senderId);
         repo.deleteById(id);
+        logger.info("Activity with id {} deleted",id);
     }
 
     /**
@@ -177,6 +204,7 @@ public class ActivityService {
         isActivityBelongNotToTeacher(activity,senderId);
         activity.getClass().getDeclaredMethod("set" +  firstLetterToUpper(partName),String.class).invoke(activity,newValue);
         repo.save(activity);
+        logger.info("Activity with id {} updated" ,activityId);
     }
 
     /**

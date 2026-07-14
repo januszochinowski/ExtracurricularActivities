@@ -1,5 +1,6 @@
 package com.example.extracurricularactivities;
 
+import com.example.extracurricularactivities.Model.Student;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
 import com.example.extracurricularactivities.Service.TeachersService;
@@ -29,6 +30,7 @@ public class ExtracurricularActivitiesApplication {
         teacher.setPhoneNumber("5745243637");
 
         context.getBean(TeachersService.class).addTeacher(teacher);
+
 
 
     }

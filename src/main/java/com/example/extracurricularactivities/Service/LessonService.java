@@ -1,11 +1,16 @@
 package com.example.extracurricularactivities.Service;
 
 import com.example.extracurricularactivities.Model.Activity;
+import com.example.extracurricularactivities.Model.Attendance;
 import com.example.extracurricularactivities.Model.Lesson;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.Repo.LessonRepo;
+import com.example.extracurricularactivities.config.JWTFilter;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.annotations.ColumnTransformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +25,12 @@ public class LessonService {
 
     private final LessonRepo repo;
     private final TeachersService teachersService;
-
-    public LessonService(LessonRepo repo, TeachersService teachersService) {
+    private final ApplicationContext context;
+    private final Logger logger = LoggerFactory.getLogger(LessonService.class);
+    public LessonService(LessonRepo repo, TeachersService teachersService, ApplicationContext context) {
         this.repo = repo;
         this.teachersService = teachersService;
+        this.context = context;
     }
 
     /**
@@ -62,7 +69,7 @@ public class LessonService {
     /**
      *Get all Lesson of Activities belongs to selected Teacher
      * @param page number of pages
-     * @param size  number of elemnts in a page
+     * @param size  number of elements in a page
      * @param teacherId ID of selected teacher
      * @return list of founded Lesson
      */
@@ -100,10 +107,11 @@ public class LessonService {
      * Mark selected Lesson as Cancel
      * @param id ID of selected Lesson
      */
-    public void cancel(long id){
+    public void cancel(long id, boolean value){
         Lesson lesson = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Lesson with id " + id + " not found!") );
-        lesson.setIsCancelled(true);
+        lesson.setIsCancelled(value);
         update(lesson);
+        logger.info("Lesson {} is cancelled", id);
     }
 
     /**
@@ -128,6 +136,14 @@ public class LessonService {
         lesson.setSubstituteTeacher(teacher);
         repo.save(lesson);
     }
+
+    public List<Lesson> getStudentLessonsInDate(long studentId, LocalDate date ){
+       return  context.getBean(AttendanceService.class).getByStudent(studentId).stream()
+               .map((Attendance::getLesson))
+               .filter(lesson -> lesson.getDate().isEqual(date))
+               .toList();
+    }
+
 
 
 

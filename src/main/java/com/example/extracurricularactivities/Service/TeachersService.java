@@ -106,8 +106,12 @@ public class TeachersService {
      * @param newValue <- new value
      */
    public void  update(Long id,StringBuilder partName, String newValue ) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
         Teacher teacher = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Teacher with id " + id + " not found!") );
+
+        if(partName.toString().equals("Password") ||  partName.toString().equals("password")) {
+            newValue = context.getBean(BCryptPasswordEncoder.class, "passwordEncoder").encode(newValue);
+        }
+
         teacher.getClass().getDeclaredMethod("set" + ActivityService.firstLetterToUpper(partName),String.class).invoke(teacher,newValue);
         repo.save(teacher);
    }

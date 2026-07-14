@@ -1,6 +1,8 @@
 package com.example.extracurricularactivities.config;
 
 import com.example.extracurricularactivities.Service.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +23,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +34,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JWTFilter jwtFilter;
+    private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,JWTFilter jwtFilter) {
         this.customUserDetailsService = customUserDetailsService;
@@ -40,21 +48,40 @@ public class SecurityConfig {
     }
 
     @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(false);
+        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",config);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable)
-                        .formLogin(AbstractHttpConfigurer::disable)
-                        .httpBasic(AbstractHttpConfigurer::disable)
-                        .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
-                                .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                                .requestMatchers("/teacher/**").hasAnyAuthority("TEACHER","ADMIN")
-                                .requestMatchers(HttpMethod.PUT,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
-                                .requestMatchers(HttpMethod.PATCH,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/activity/**").hasAnyAuthority("TEACHER","ADMIN")
-                                .anyRequest().authenticated()
-                        )
-                        .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        HttpSecurity httpSecurity = http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(r -> r.requestMatchers("/login", "/create").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/teacher/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/activity/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/activity/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/activity/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers("/attendance/**").hasAnyAuthority("STUDENT", "ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/lesson/**").hasAnyAuthority("STUDENT","ADMIN","TEACHER")
+                        .requestMatchers(HttpMethod.PATCH,"/lesson/**").hasAnyAuthority("ADMIN","TEACHER")
+                        .requestMatchers(HttpMethod.DELETE,"/lesson/**").hasAnyAuthority("ADMIN","TEACHER")
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((e) -> logger.error("Authorization Faild"));
         return  http.build();
     }
 

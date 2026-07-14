@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface ActivityRepo extends JpaRepository<Activity, Long> {
@@ -25,6 +26,7 @@ public interface ActivityRepo extends JpaRepository<Activity, Long> {
 
     @Query("SELECT  a FROM Activity  a WHERE a.startDate >= :afterDate")
     Page<Activity> findAllAfterDate(Pageable pageable, LocalDate afterDate);
+
     Page<Activity> findActivitiesByTeacherIdAfterOrStartDate(Long teacherId, Pageable pageable, LocalDate AfterDate);
 
     @Query("SELECT a FROM Activity a  WHERE a.name LIKE %:name AND a.startDate >= :afterDate")
@@ -33,6 +35,9 @@ public interface ActivityRepo extends JpaRepository<Activity, Long> {
     @Query("SELECT a FROM Activity a  WHERE a.location LIKE %:name AND a.startDate >= :afterDate")
     Page<Activity> findActivitiesByLocationStartingWith(String name, Pageable pageable,LocalDate afterDate );
 
+    @Query("SELECT a FROM Activity  a WHERE a.teacher.surname LIKE %:surname AND a.startDate >= :afterDate")
+    List<Activity> findActivitiesByTeacherSurname(String surname, int page, int pageSize, LocalDate afterDate);
 
-
+    @Query("SELECT a FROM Activity a WHERE a.teacher.surname LIKE  %:surname")
+    List<Activity> findActivitiesByTeacherSurname(String surname, int page, int pageSize);
 }
