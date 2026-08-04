@@ -36,7 +36,7 @@ public class ActivityController {
     }
 
     @GetMapping("/byTeacher")
-    public ResponseEntity<List<Activity>> getActivitiesByTeacherId(@RequestParam(name="id") long teacherId ,
+    public ResponseEntity<List<Activity>> getActivitiesByTeacherId(@RequestParam(name="text") long teacherId ,
                                                                    @RequestParam(required = false, defaultValue = "0") int page,
                                                                    @RequestParam(required = false, defaultValue = "10") int pageSize,
                                                                    @RequestParam(required = false)LocalDate afterDate){
@@ -46,15 +46,7 @@ public class ActivityController {
     }
 
 
-    @GetMapping("/byTeacherSurname")
-    public ResponseEntity<List<Activity>> getActivitiesByTeacherSurname(@RequestParam(name="teacher") long id  ,
-                                                                        @RequestParam(required = false, defaultValue = "0") int page,
-                                                                        @RequestParam(required = false, defaultValue = "10") int pageSize,
-                                                                        @RequestParam(required = false)LocalDate afterDate){
-        if(afterDate != null)
-            return ResponseEntity.ok(service.getActivitiesByTeacherId(id ,page,pageSize, afterDate));
-        return ResponseEntity.ok(service.getActivitiesByTeacherId(id, page, pageSize));
-    }
+
 
     @GetMapping("/byName")
     public ResponseEntity<List<Activity>> getActivitiesByName(@RequestParam(name="text") String name,
@@ -92,9 +84,9 @@ public class ActivityController {
     }
 
     @PutMapping()
-    public ResponseEntity<Activity> updateActivity(@RequestBody Activity activity, @RequestHeader("Authorization")  String header){
+    public ResponseEntity<String> updateActivity(@RequestBody Activity activity, @RequestHeader("Authorization")  String header){
         service.updateAll(activity,Long.parseLong(jwtService.extractIdFromHeader(header)));
-        return ResponseEntity.ok(activity);
+        return ResponseEntity.ok("Activity "+ activity.getId() + " updated-");
     }
 
 

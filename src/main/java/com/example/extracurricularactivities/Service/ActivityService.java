@@ -173,9 +173,10 @@ public class ActivityService {
      * @param activity new data
      * @param senderId id of Teacher who send request
      */
+    @Transactional
     public void updateAll(Activity activity, long senderId){
-
         isActivityBelongNotToTeacher(activity,senderId);
+        activity.setTeacher(teacherService.getTeacherById(senderId).orElseThrow( () -> new EntityNotFoundException("You are not teacher")));
         repo.save(activity);
     }
 

@@ -75,7 +75,7 @@ public class AdminController {
 
         if(role.equalsIgnoreCase("student"))
             return ResponseEntity.ok(studentService.getStudentById(id).orElseThrow(EntityNotFoundException::new));
-        else if (role.equalsIgnoreCase("teacher"))
+        else if (role.equalsIgnoreCase("teacher") || role.equalsIgnoreCase("admin") )
             return ResponseEntity.ok(teacherService.getTeacherById(id).orElseThrow(EntityNotFoundException::new));
         else
             throw new EntityNotFoundException("Invalid name of part");
@@ -92,7 +92,7 @@ public class AdminController {
      */
     @PostMapping("")
     public ResponseEntity<Long> addTeacher(@RequestBody Teacher teacher, @RequestParam(required = false,defaultValue = "teacher") String role) {
-        teacher.setIsAdmin(role.equals("admin"));
+       // teacher.setIsAdmin(role.equals("admin"));
       return  new ResponseEntity<>(teacherService.addTeacher(teacher),HttpStatus.CREATED);
     }
 
