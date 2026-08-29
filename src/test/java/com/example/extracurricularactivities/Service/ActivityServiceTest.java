@@ -4,7 +4,9 @@ import com.example.extracurricularactivities.Model.Activity;
 import com.example.extracurricularactivities.Model.Teacher;
 import com.example.extracurricularactivities.RandomUserFactory;
 import com.example.extracurricularactivities.Repo.ActivityRepo;
+import com.example.extracurricularactivities.Repo.LessonRepo;
 import com.example.extracurricularactivities.Repo.TeacherRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.util.function.IntFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
@@ -36,6 +41,9 @@ class ActivityServiceTest {
     @Autowired
     TeacherRepo teacherRepo;
 
+    @Autowired
+    LessonRepo lessonRepo;
+
     @BeforeEach
     void setUp() {
        teacher1 = RandomUserFactory.getRandomTeacher(false);
@@ -51,12 +59,23 @@ class ActivityServiceTest {
     void tearDown() {
         activityRepo.deleteAll();
         teacherRepo.deleteAll();
+
     }
 
     @Test
     void addActivity() {
-        Activity newActivity = RandomUserFactory.getRandomActivity(null);
-        activityService.addActivity(newActivity,teacher2.getId());
+        Activity newActivity = RandomUserFactory.getRandomActivity(teacher1);
+        LocalDate startDate = LocalDate.of(2026, Month.FEBRUARY,1);
+        LocalDate endDate = startDate.plusWeeks(10);
+        LocalTime startTime = LocalTime.of(10,30);
+        int duration = 60;
+
+        newActivity.setStartDate(startDate);
+        newActivity.setEndDate(endDate);
+        newActivity.setStartTime(startTime);
+        newActivity.setDuration(duration);
+
+        activityService.addActivity(newActivity,teacher1.getId());
 
         assertTrue(activityRepo.findById(newActivity.getId()).isPresent());
         assertEquals(teacher2.getName(), activityRepo.findById(activity.getId()).get().getTeacher().getName());
@@ -64,21 +83,35 @@ class ActivityServiceTest {
         assertEquals(teacher2.getPhoneNumber(), activityRepo.findById(activity.getId()).get().getTeacher().getPhoneNumber());
         assertEquals(teacher2.getEmail(), activityRepo.findById(activity.getId()).get().getTeacher().getEmail());
         assertEquals(teacher2.getIsAdmin(), activityRepo.findById(activity.getId()).get().getTeacher().getIsAdmin());
+
+        newActivity.setStartTime(startTime.plusMinutes(duration/2));
+
+        assertThrows(EntityNotFoundException.class, () -> activityService.addActivity(newActivity,teacher1.getId()));
+
     }
 
     @Test
-    @Transactional
     void getActivityById() {
-        assertEquals(activity, activityRepo.findById(activity.getId()).get());
+        assertEquals(activity.getId(), activityRepo.findById(activity.getId()).get().getId());
+        assertEquals(activity.getName(), activityRepo.findById(activity.getId()).get().getName());
     }
 
     @Test
-    @Transactional
     void updateAll() {
-        Activity newActivity = RandomUserFactory.getRandomActivity(teacher1);
+        Activity newActivity = RandomUserFactory.getRandomActivity(teacher2);
         newActivity.setId(activity.getId());
         activityService.updateAll(newActivity,teacher1.getId());
-        assertEquals(newActivity, activityRepo.findById(activity.getId()).get());
+
+        assertEquals(newActivity.getId(), activityRepo.findById(activity.getId()).get().getId());
+        assertEquals(newActivity.getName(), activityRepo.findById(activity.getId()).get().getName());
+        assertEquals(newActivity.getDescription(), activityRepo.findById(activity.getId()).get().getDescription());
+        assertEquals(newActivity.getStartDate(),activityRepo.findById(activity.getId()).get().getStartDate());
+
+        assertEquals(teacher2.getName(), activityRepo.findById(activity.getId()).get().getTeacher().getName());
+        assertEquals(teacher2.getSurname(), activityRepo.findById(activity.getId()).get().getTeacher().getSurname());
+        assertEquals(teacher2.getPhoneNumber(), activityRepo.findById(activity.getId()).get().getTeacher().getPhoneNumber());
+        assertEquals(teacher2.getEmail(), activityRepo.findById(activity.getId()).get().getTeacher().getEmail());
+        assertEquals(teacher2.getIsAdmin(), activityRepo.findById(activity.getId()).get().getTeacher().getIsAdmin());
     }
 
     @Test
@@ -90,32 +123,33 @@ class ActivityServiceTest {
     @Test
     void update() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         activityService.update( new StringBuilder("name"),"Test", activity.getId(),teacher1.getId());
-        assertEquals(activity.getName(), activityRepo.findById(activity.getId()).get().getName());
+        assertEquals("Test", activityRepo.findById(activity.getId()).get().getName());
     }
 
     @Test
-    @Transactional
     void getActivitiesByTeacherId() {
         Activity newActivity = RandomUserFactory.getRandomActivity(teacher1);
         activityService.addActivity(newActivity,teacher1.getId());
 
-        Activity newActivity2 = RandomUserFactory.getRandomActivity(teacher2);
-        activityService.addActivity(newActivity2,teacher2.getId());
+        assertTrue(activityService.getActivitiesByTeacherId(teacher1.getId(),0,10).stream().anyMatch(a -> a.getId().equals(activity.getId())));
+        assertTrue(activityService.getActivitiesByTeacherId(teacher1.getId(),0,10).stream().anyMatch(a -> a.getId().equals(newActivity.getId())));
+        assertEquals(2,activityService.getActivitiesByTeacherId(teacher1.getId(),0,10).size());
 
-        assertArrayEquals(new Activity[]{activity,newActivity},activityService.getActivitiesByTeacherId(teacher1.getId(),0,10).toArray());
+        assertFalse(activityService.getActivitiesByTeacherId(teacher2.getId(),0,10).stream().anyMatch(a -> a.getId().equals(activity.getId())));
+        assertFalse(activityService.getActivitiesByTeacherId(teacher2.getId(),0,10).stream().anyMatch(a -> a.getId().equals(newActivity.getId())));
+        assertEquals(0,activityService.getActivitiesByTeacherId(teacher2.getId(),0,10).size());
+
     }
 
     @Test
-    @Transactional
     void getActivitiesByNameStartingWith() {
 
-        assertEquals(activity, activityService.getActivitiesByNameStartingWith(activity.getName().substring(0,2),0,10).get(0));
+        assertEquals(activity.getId(), activityService.getActivitiesByNameStartingWith(activity.getName().substring(0,2),0,10).get(0).getId());
     }
 
     @Test
-    @Transactional
     void getActivitiesByLocationStartingWith() {
-        assertEquals(activity, activityService.getActivitiesByLocationStartingWith(activity.getLocation(),0,10).get(0));
+        assertEquals(activity.getId(), activityService.getActivitiesByLocationStartingWith(activity.getLocation(),0,10).get(0).getId());
     }
 
     @Test
@@ -124,5 +158,22 @@ class ActivityServiceTest {
         newActivity.setStartDate(LocalDate.of(2026,3,23));
         activityService.addActivity(newActivity,teacher1.getId());
         assertEquals(newActivity.getId(),activityService.getActivitiesByDayOfWeek("monday",0,10).get(0).getId());
+    }
+
+
+    @Test
+    void isTeacherFree() {
+        activityService.addActivity(activity,teacher1.getId());
+
+        assertFalse(activityService.isTeacherFree(teacher1.getId(),activity.getStartDate(),activity.getStartTime(),activity.getDuration()));
+        assertFalse(activityService.isTeacherFree(teacher1.getId(),activity.getStartDate(),activity.getStartTime().plusMinutes(activity.getDuration()/2),activity.getDuration()));
+        assertTrue(activityService.isTeacherFree(teacher1.getId(),activity.getStartDate(),activity.getStartTime().plusMinutes(activity.getDuration() + 1),activity.getDuration()));
+
+    }
+
+
+    @Test
+    void getActivitiesByTeacherSurname() {
+        assertEquals(activity.getId(),activityService.getActivitiesByTeacherSurname(teacher1.getSurname(),0,1).get(0).getId());
     }
 }

@@ -74,7 +74,7 @@ public class LessonController {
     }
 
     @PatchMapping("/date")
-    public ResponseEntity<String> updateLesson(@RequestParam long id,
+    public ResponseEntity<String> updateLessonDate(@RequestParam long id,
                                                @RequestParam(name = "value") LocalDate newValue) {
        lessonService.updateDate(newValue,id);
        return ResponseEntity.ok("Update lesson id "+id);

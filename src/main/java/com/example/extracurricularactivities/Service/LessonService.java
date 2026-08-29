@@ -94,16 +94,6 @@ public class LessonService {
     }
 
     /**
-     * Update all Lesson data
-     */
-
-    public void updateDate(LocalDate newDate, long id) {
-        Lesson lesson = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson with id " + id + " not found!"));
-        lesson.setDate(newDate);
-        update(lesson);
-    }
-
-    /**
      * Mark selected Lesson as Cancel
      * @param id ID of selected Lesson
      */
@@ -112,6 +102,15 @@ public class LessonService {
         lesson.setIsCancelled(value);
         update(lesson);
         logger.info("Lesson {} is cancelled", id);
+    }
+
+    /**
+     * Update all Lesson data
+     */
+    public void updateDate(LocalDate newDate, long id) {
+        Lesson lesson = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson with id " + id + " not found!"));
+        lesson.setDate(newDate);
+        update(lesson);
     }
 
     /**
@@ -134,7 +133,7 @@ public class LessonService {
         Lesson lesson = repo.findById(id).orElseThrow( () -> new EntityNotFoundException("Lesson with id " + id + " not found!") );
         Teacher teacher = teachersService.getTeacherById(teacherId).orElseThrow( () -> new EntityNotFoundException("Teacher not found!") );
         lesson.setSubstituteTeacher(teacher);
-        repo.save(lesson);
+        update(lesson);
     }
 
     public List<Lesson> getStudentLessonsInDate(long studentId, LocalDate date ){

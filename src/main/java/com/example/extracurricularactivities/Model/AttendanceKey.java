@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,15 @@ public class AttendanceKey implements Serializable {
 
     @Column(name= "lesson_id", nullable = false)
     Long lessonId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AttendanceKey that)) return false;
+        return Objects.equals(studentId, that.studentId) && Objects.equals(lessonId, that.lessonId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(studentId, lessonId);
+    }
 }

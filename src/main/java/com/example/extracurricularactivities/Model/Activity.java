@@ -12,6 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -77,5 +78,16 @@ public class Activity {
         teacher = null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Activity activity = (Activity) o;
+        return minAge == activity.minAge && maxAge == activity.maxAge && duration == activity.duration && maxNumberOfStudents == activity.maxNumberOfStudents && Objects.equals(id, activity.id) && Objects.equals(name, activity.name) && Objects.equals(description, activity.description) && Objects.equals(location, activity.location) && Objects.equals(startDate, activity.startDate) && Objects.equals(endDate, activity.endDate) && Objects.equals(startTime, activity.startTime) && Objects.equals(teacher, activity.teacher) && Objects.equals(lesson, activity.lesson);
+    }
 
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, location, minAge, maxAge, startDate, endDate, duration, maxNumberOfStudents, startTime, teacher, lesson);
+    }
 }

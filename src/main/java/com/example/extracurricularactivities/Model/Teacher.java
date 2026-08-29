@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -40,5 +41,17 @@ public class Teacher extends User {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Teacher teacher)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(name, teacher.name) && Objects.equals(surname, teacher.surname) && Objects.equals(phoneNumber, teacher.phoneNumber) && Objects.equals(email, teacher.email) && Objects.equals(isAdmin, teacher.isAdmin) && Objects.equals(activities, teacher.activities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, surname, phoneNumber, email, isAdmin, activities);
     }
 }

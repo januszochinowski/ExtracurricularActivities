@@ -47,7 +47,7 @@ public abstract class RandomUserFactory {
         activity.setMinAge(0);
         activity.setMaxAge(10);
         activity.setStartDate(LocalDate.now());
-        activity.setEndDate(LocalDate.now());
+        activity.setEndDate(activity.getStartDate().plusMonths(4));
         activity.setDuration(10);
         activity.setMaxNumberOfStudents(10);
         activity.setStartTime(LocalTime.parse(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))));

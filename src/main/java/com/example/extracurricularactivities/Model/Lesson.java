@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -43,7 +44,7 @@ public class Lesson {
     @JoinColumn(name = "substitute_teacher_id")
     Teacher substituteTeacher;
 
-    @OneToMany(mappedBy = "attendanceKey.lessonId")
+    @OneToMany(mappedBy = "attendanceKey.lessonId",cascade = CascadeType.ALL)
     @JsonIgnore
     List<Attendance> attendances;
 
@@ -55,5 +56,15 @@ public class Lesson {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Lesson lesson)) return false;
+        return Objects.equals(id, lesson.id) && Objects.equals(date, lesson.date) && Objects.equals(isCancelled, lesson.isCancelled) && Objects.equals(startTime, lesson.startTime) && Objects.equals(activity, lesson.activity) && Objects.equals(substituteTeacher, lesson.substituteTeacher) && Objects.equals(attendances, lesson.attendances);
+    }
 
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, date, isCancelled, startTime, activity, substituteTeacher, attendances);
+    }
 }
